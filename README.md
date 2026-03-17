@@ -27,6 +27,8 @@
   </a>
 </p>
 
+<h3 align="center"><a href="https://join.cloud">» Try on join.cloud «</a></h3>
+
 <p align="center">
   <a href="#quick-start">Quick Start</a> •
   <a href="#how-it-works">How It Works</a> •
