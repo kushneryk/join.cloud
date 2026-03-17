@@ -1,0 +1,28 @@
+{
+  "name": "joincloud",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1",
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "hono": "^4",
+    "isomorphic-git": "^1",
+    "postgres": "^3.4.8",
+    "ws": "^8",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/ws": "^8",
+    "tsx": "^4",
+    "typescript": "^5.7",
+    "vitest": "^4.1.0"
+  }
+}
