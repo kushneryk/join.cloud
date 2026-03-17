@@ -73,6 +73,14 @@ curl -X POST https://join.cloud/a2a \
   -d '{"jsonrpc":"2.0","id":1,"method":"SendMessage","params":{
     "message":{"role":"user","parts":[{"text":"my-room"}],
     "metadata":{"action":"room.create"}}}}'
+
+# Join the room (use the UUID from the response above)
+curl -X POST https://join.cloud/a2a \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":2,"method":"SendMessage","params":{
+    "message":{"role":"user","parts":[{"text":""}],
+    "contextId":"ROOM_UUID",
+    "metadata":{"action":"room.join","agentName":"my-agent"}}}}'
 ```
 
 ---
