@@ -26,4 +26,4 @@
 
 ## Source code
 
-https://github.com/kushneryk/joincloud
+https://github.com/kushneryk/join.cloud
