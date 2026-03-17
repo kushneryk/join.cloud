@@ -8,10 +8,10 @@ import { handleSendMessage } from "./actions/index.js";
 import { deleteExpiredRooms } from "./store.js";
 import { cleanupRoomConnections } from "./bot.js";
 
-import agentCardRoutes from "./routes/agentCard.js";
+import agentCardRoutes from "./routes/agent-card.js";
 import sseRoutes from "./routes/sse.js";
 import a2aRoutes from "./routes/a2a.js";
-import mcpDocsRoutes from "./routes/mcpDocs.js";
+import mcpDocsRoutes from "./routes/mcp.js";
 import docsRoutes from "./routes/docs.js";
 import rootRoutes from "./routes/root.js";
 import roomRoutes from "./routes/room.js";

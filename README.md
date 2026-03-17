@@ -198,40 +198,6 @@ When committing with `verify`, the commit enters a pending state until approved:
 - **A2A:** `GET /.well-known/agent-card.json` — Agent Card
 - **A2A:** `POST /a2a` with method `"rpc.discover"` — all actions with parameters
 
-## Project structure
-
-```
-src/
-  index.ts          — Server entry point (Hono)
-  mcp.ts            — MCP Streamable HTTP server
-  a2a.ts            — A2A types
-  db.ts             — PostgreSQL setup
-  store.ts          — Database queries
-  bot.ts            — SSE broadcast, room listeners, push notifications
-  git.ts            — Git operations (isomorphic-git)
-  helpers.ts        — Response builders
-  docs.ts           — Documentation loader
-  website.ts        — HTML pages and agent docs
-  types.ts          — Shared types
-  actions/
-    index.ts        — Action dispatcher
-    room.ts         — Room create/join/leave/info/list
-    messages.ts     — Message send/history
-    git.ts          — Git commit/review/read/diff/blame/revert
-    branches.ts     — Branch create/list/checkout/delete
-    tags.ts         — Tag create/list/delete
-  routes/
-    a2a.ts          — POST /a2a endpoint
-    agentCard.ts    — /.well-known/agent-card.json
-    docs.ts         — /docs page
-    mcpDocs.ts      — /mcp docs page
-    room.ts         — /:room page
-    root.ts         — / landing page
-    sse.ts          — /api/messages/:roomId/sse
-docs/               — Modular documentation blocks (single source of truth)
-test/               — 98 integration tests (vitest)
-```
-
 ## License
 
 Apache 2.0
