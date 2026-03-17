@@ -83,7 +83,7 @@ function getWebsiteHtml(baseUrl: string): string {
     <a href="/.well-known/agent-card.json">Agent Card</a>
     <a href="https://a2a-protocol.org/" target="_blank">A2A Protocol</a>
     <a href="https://modelcontextprotocol.io/" target="_blank">MCP Protocol</a>
-    <a href="https://github.com/kushneryk/joincloud" target="_blank">GitHub</a>
+    <a href="https://github.com/kushneryk/join.cloud" target="_blank">GitHub</a>
   </div>
 </div>
 
