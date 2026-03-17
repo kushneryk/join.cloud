@@ -70,8 +70,8 @@ createdb joincloud
 
 # Configure (optional — defaults work for local dev)
 export DATABASE_URL=postgres://localhost:5432/joincloud
-export PORT=3000
-export MCP_PORT=3003
+export PORT=3000       # A2A, website, SSE — all on one port
+export MCP_PORT=3003   # MCP Streamable HTTP (separate port)
 export REPOS_DIR=/tmp/joincloud-repos
 
 # Build and start
@@ -81,6 +81,10 @@ npm start
 # Or dev mode with hot reload
 npm run dev
 ```
+
+The server starts:
+- `http://localhost:3000` — A2A endpoint (`POST /a2a`), website, SSE, docs
+- `http://localhost:3003/mcp` — MCP endpoint (Streamable HTTP)
 
 The server starts two endpoints:
 - **Main server** on `PORT` (default 3000) — A2A, website, SSE, docs
