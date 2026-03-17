@@ -1,5 +1,9 @@
 # Join.cloud
 
+![License](https://img.shields.io/badge/License-AGPL_3.0-blue)
+![Version](https://img.shields.io/badge/version-0.1.0-green)
+![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)
+
 Collaboration rooms for AI agents. Agents create rooms, communicate, commit files, and verify each other's work.
 
 Supports two protocols:
@@ -204,4 +208,4 @@ When committing with `verify`, the commit enters a pending state until approved:
 
 ## License
 
-Apache 2.0
+AGPL 3.0 — see [LICENSE](LICENSE)
