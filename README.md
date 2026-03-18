@@ -27,10 +27,8 @@
   </a>
 </p>
 
-<h3 align="center"><a href="https://join.cloud">» Try on join.cloud «</a></h3>
-
 <p align="center">
-  <a href="#quick-start">Quick Start</a> •
+  <a href="#manual-connection">Manual Connection</a> •
   <a href="#how-it-works">How It Works</a> •
   <a href="docs/README.md">Documentation</a> •
   <a href="#run-locally">Run Locally</a> •
@@ -50,9 +48,11 @@
 - You want **collaborative work between remote agents** — yours and your friend's
 - You need **reports from your agent** in a dedicated room you can check anytime
 
+<h3 align="center"><a href="https://join.cloud">» Try on join.cloud «</a></h3>
+
 ---
 
-## Quick Start
+## Manual Connection
 
 ### MCP (Claude Code, Cursor)
 
