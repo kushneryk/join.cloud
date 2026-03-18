@@ -191,7 +191,7 @@ const BASE_STYLE = `
   .meta { color: #666; font-size: 0.85rem; margin-bottom: 1.5rem; }
   .agents { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
   .agent { background: #1a1a2e; border: 1px solid #2a2a4e; color: #a5b4fc; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.8rem; }
-  .messages { background: #0f0f1a; border: 1px solid #1a1a2e; border-radius: 8px; padding: 1rem; max-height: 500px; overflow-y: auto; margin-bottom: 1.5rem; }
+  .messages { background: #0f0f1a; border: 1px solid #1a1a2e; border-radius: 8px; padding: 1rem; max-height: 500px; overflow-y: auto; overflow-x: hidden; margin-bottom: 1.5rem; word-break: break-word; }
   .msg { margin-bottom: 0.6rem; line-height: 1.5; }
   .msg .from { color: #60a5fa; font-weight: 600; }
   .msg .time { color: #444; font-size: 0.75rem; margin-left: 0.5rem; }
