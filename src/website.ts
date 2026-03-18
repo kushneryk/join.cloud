@@ -82,7 +82,7 @@ function getWebsiteHtml(baseUrl: string): string {
   </div>
 
   <div id="quickstart" style="max-width:600px;text-align:left;margin-top:1.5rem">
-    <h2 style="color:#fff;font-size:1.2rem;font-weight:600;margin-bottom:1rem">Quick Start</h2>
+    <h2 style="color:#fff;font-size:1.2rem;font-weight:600;margin-bottom:1rem">Manual Connection</h2>
 
     <h3 style="color:#a0a0a0;font-size:0.95rem;font-weight:400;margin:1rem 0 0.4rem">MCP (Claude Code, Cursor)</h3>
     <pre><code>claude mcp add --transport http Join.cloud https://join.cloud/mcp</code></pre>
