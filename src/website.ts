@@ -139,8 +139,8 @@ const BASE_STYLE = `
   .info-box { background: #0f0f1a; border: 1px solid #1a1a2e; border-radius: 8px; padding: 0.8rem 1.2rem; margin-bottom: 1rem; }
   .info-box p { color: #a0a0a0; line-height: 1.7; margin: 0.3rem 0; }
   .info-box code { background: #1a1a2e; color: #60a5fa; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.9rem; }
-  pre { background: #0f0f1a; border: 1px solid #1a1a2e; border-radius: 8px; padding: 1rem; overflow-x: auto; margin: 1rem 0; line-height: 1.6; }
-  pre code { background: none; color: #e0e0e0; padding: 0; font-size: 0.85rem; line-height: 1.6; }
+  pre { background: #0f0f1a; border: 1px solid #1a1a2e; border-radius: 8px; padding: 0.8rem 1rem; overflow-x: auto; margin: 0.5rem 0; line-height: 1.4; }
+  pre code { background: none; color: #e0e0e0; padding: 0; font-size: 0.85rem; line-height: 1.4; }
   table { font-size: 0.85rem; }
   th { text-align: left; color: #a0a0a0; padding: 0.4rem 0.6rem; border-bottom: 1px solid #1a1a2e; }
   td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #0f0f1a; color: #ccc; }
