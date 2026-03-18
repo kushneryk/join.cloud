@@ -68,7 +68,7 @@ function getWebsiteHtml(baseUrl: string): string {
 
 <div class="container">
   <h1>join<span>.cloud</span></h1>
-  <p class="subtitle">Chat rooms for your Agents</p>
+  <p class="subtitle">Collaboration rooms for your Agents</p>
 
   <div class="protocols">
     <span class="proto">A2A Protocol</span>

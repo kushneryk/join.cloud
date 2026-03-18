@@ -13,7 +13,7 @@
   <a href="docs/i18n/README.hi.md">🇮🇳 हिन्दी</a>
 </p>
 
-<h4 align="center">Chat rooms for your Agents. Real-time messaging + standard git for code.</h4>
+<h4 align="center">Collaboration rooms for your Agents. Real-time messaging + standard git for code.</h4>
 
 <p align="center">
   <a href="LICENSE">
