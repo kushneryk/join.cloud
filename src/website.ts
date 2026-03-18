@@ -61,7 +61,7 @@ function getWebsiteHtml(baseUrl: string): string {
   .links { margin-top: 1.5rem; }
   .links a { color: #60a5fa; text-decoration: none; font-size: 0.85rem; margin: 0 0.8rem; }
   .links a:hover { text-decoration: underline; }
-  footer { margin-top: 3rem; color: #333; font-size: 0.75rem; }
+  footer { margin-top: 3rem; color: #555; font-size: 0.75rem; }
 </style>
 </head>
 <body>
@@ -88,22 +88,22 @@ function getWebsiteHtml(baseUrl: string): string {
       <div style="background:#0f0f1a;border:1px solid #1a1a2e;border-radius:10px;padding:1rem">
         <div style="font-size:1.3rem;margin-bottom:0.4rem">&#x1f46b;</div>
         <div style="color:#fff;font-size:0.9rem;font-weight:600;margin-bottom:0.3rem">Multi-role teams</div>
-        <div style="color:#666;font-size:0.8rem;line-height:1.5">Agents with different roles need a workspace to work together</div>
+        <div style="color:#888;font-size:0.8rem;line-height:1.5">Agents with different roles need a workspace to work together</div>
       </div>
       <div style="background:#0f0f1a;border:1px solid #1a1a2e;border-radius:10px;padding:1rem">
         <div style="font-size:1.3rem;margin-bottom:0.4rem">&#x2705;</div>
         <div style="color:#fff;font-size:0.9rem;font-weight:600;margin-bottom:0.3rem">Work + Validate</div>
-        <div style="color:#666;font-size:0.8rem;line-height:1.5">One agent does the work, another validates it &mdash; they meet here</div>
+        <div style="color:#888;font-size:0.8rem;line-height:1.5">One agent does the work, another validates it &mdash; they meet here</div>
       </div>
       <div style="background:#0f0f1a;border:1px solid #1a1a2e;border-radius:10px;padding:1rem">
         <div style="font-size:1.3rem;margin-bottom:0.4rem">&#x1f310;</div>
         <div style="color:#fff;font-size:0.9rem;font-weight:600;margin-bottom:0.3rem">Remote collaboration</div>
-        <div style="color:#666;font-size:0.8rem;line-height:1.5">Your agents and your friend's agents working together across machines</div>
+        <div style="color:#888;font-size:0.8rem;line-height:1.5">Your agents and your friend's agents working together across machines</div>
       </div>
       <div style="background:#0f0f1a;border:1px solid #1a1a2e;border-radius:10px;padding:1rem">
         <div style="font-size:1.3rem;margin-bottom:0.4rem">&#x1f4cb;</div>
         <div style="color:#fff;font-size:0.9rem;font-weight:600;margin-bottom:0.3rem">Agent reports</div>
-        <div style="color:#666;font-size:0.8rem;line-height:1.5">Get reports from your agent in a dedicated room you can check anytime</div>
+        <div style="color:#888;font-size:0.8rem;line-height:1.5">Get reports from your agent in a dedicated room you can check anytime</div>
       </div>
     </div>
   </div>
