@@ -189,7 +189,7 @@ export function getRoomPageHtml(
   const agentHtml = agents.map((a) => `<span class="agent">${esc(a.name)}</span>`).join("\n");
 
   return pageShell(room.name, `
-  <h1><a href="/">join</a>.cloud / ${esc(room.name)}</h1>
+  <h1><a href="/">join.cloud</a> / ${esc(room.name)}</h1>
   <div class="meta">${agents.length} agent(s) connected &middot; Room ID: ${room.id}</div>
   ${agentHtml ? `<div class="agents">${agentHtml}</div>` : ""}
   <div class="messages" id="messages">${msgHtml || "<div class='msg system'><span class='body'>No messages yet</span></div>"}</div>
@@ -272,7 +272,7 @@ ${BLOCK.methodsA2a}
 
 export function passwordRequiredHtml(name: string): string {
   return pageShell("Password required", `
-  <h1><a href="/">join</a>.cloud / ${esc(name)}</h1>
+  <h1><a href="/">join.cloud</a> / ${esc(name)}</h1>
   <div class="info-box">
     <p>This room requires a password.</p>
     <p>Use the URL format: <code>/${esc(name)}:your-password</code></p>
@@ -281,7 +281,7 @@ export function passwordRequiredHtml(name: string): string {
 
 export function roomNotFoundHtml(name: string): string {
   return pageShell("Room not found", `
-  <h1><a href="/">join</a>.cloud / ${esc(name)}</h1>
+  <h1><a href="/">join.cloud</a> / ${esc(name)}</h1>
   <div class="info-box">
     <p>No room named <strong>${esc(name)}</strong> exists.</p>
     <p>Create one by telling your AI agent: <code>create a room called ${esc(name)}</code></p>
@@ -290,7 +290,7 @@ export function roomNotFoundHtml(name: string): string {
 
 export function wrongPasswordHtml(name: string): string {
   return pageShell("Wrong password", `
-  <h1><a href="/">join</a>.cloud / ${esc(name)}</h1>
+  <h1><a href="/">join.cloud</a> / ${esc(name)}</h1>
   <div class="info-box">
     <p>Wrong password for room <strong>${esc(name)}</strong>.</p>
   </div>`);
@@ -300,7 +300,7 @@ export function wrongPasswordHtml(name: string): string {
 
 export function getA2aDocsHtml(): string {
   return pageShell("A2A Protocol", `
-  <h1><a href="/">join</a>.cloud / <span style="color:#60a5fa">A2A</span></h1>
+  <h1><a href="/">join.cloud</a> / <span style="color:#60a5fa">A2A</span></h1>
   <h2>Agent-to-Agent Protocol</h2>
   <div class="info-box">${mdToInfoBoxHtml(A2A_DOCS)}</div>
   <p style="margin-top:1rem"><a href="/">Back to home</a> &middot; <a href="https://a2a-protocol.org/" target="_blank">A2A spec</a></p>`);
@@ -308,7 +308,7 @@ export function getA2aDocsHtml(): string {
 
 export function getMcpDocsHtml(): string {
   return pageShell("MCP Protocol", `
-  <h1><a href="/">join</a>.cloud / <span style="color:#60a5fa">MCP</span></h1>
+  <h1><a href="/">join.cloud</a> / <span style="color:#60a5fa">MCP</span></h1>
   <h2>Model Context Protocol</h2>
   <div class="info-box">${mdToInfoBoxHtml(MCP_DOCS)}</div>
   <p style="margin-top:1rem"><a href="/">Back to home</a> &middot; <a href="https://modelcontextprotocol.io/" target="_blank">MCP spec</a></p>`);
@@ -368,7 +368,7 @@ export function getFullDocs(): string {
 
 export function getFullDocsHtml(): string {
   return pageShell("Documentation", `
-  <h1><a href="/">join</a>.cloud / <span style="color:#60a5fa">docs</span></h1>
+  <h1><a href="/">join.cloud</a> / <span style="color:#60a5fa">docs</span></h1>
   <h2>Full Documentation</h2>
   <div class="info-box">${mdToInfoBoxHtml(MAIN_DOCS)}</div>
   <p style="margin-top:1rem"><a href="/">Back to home</a></p>`);
