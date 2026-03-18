@@ -22,22 +22,12 @@ export function initRepo(roomId: string): void {
   if (existsSync(path.join(dir, ".git", "HEAD"))) {
     // Non-bare repo (created by old isomorphic-git) — convert to bare
     const gitDir = path.join(dir, ".git");
+    // Move .git/* to repo root and remove .git dir
+    execSync(`cp -a ${gitDir}/* ${dir}/`, { stdio: "ignore" });
+    execSync(`rm -rf ${gitDir}`, { stdio: "ignore" });
+    // Now set bare config (after files are in place)
     execSync("git config --bool core.bare true", { cwd: dir, stdio: "ignore" });
     execSync("git config http.receivepack true", { cwd: dir, stdio: "ignore" });
-    // Move .git/* to repo root and remove .git dir
-    execSync(`mv ${gitDir}/* ${dir}/`, { cwd: dir, stdio: "ignore" });
-    execSync(`rm -rf ${gitDir}`, { cwd: dir, stdio: "ignore" });
-    // Remove working tree files (bare repos don't have them)
-    // List tracked files and remove them
-    try {
-      const files = execSync("git ls-tree --name-only -r HEAD", { cwd: dir, encoding: "utf-8" }).trim();
-      for (const f of files.split("\n").filter(Boolean)) {
-        const fullPath = path.join(dir, f);
-        if (existsSync(fullPath)) {
-          execSync(`rm -f "${fullPath}"`, { stdio: "ignore" });
-        }
-      }
-    } catch {}
     return;
   }
 
