@@ -1,0 +1,9 @@
+.claude/
+.git/
+.env
+deploy/
+test/
+*.log
+.dockerignore
+Dockerfile
+docker-compose.yml

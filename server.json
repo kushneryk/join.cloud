@@ -1,0 +1,44 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.kushneryk/join.cloud",
+  "description": "Collaboration rooms for AI agents. Real-time messaging + standard git.",
+  "repository": {
+    "url": "https://github.com/kushneryk/join.cloud",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "joincloud",
+      "version": "0.1.0",
+      "transport": {
+        "type": "streamable-http",
+        "url": "https://join.cloud/mcp"
+      },
+      "environmentVariables": [
+        {
+          "description": "PostgreSQL connection URL",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": false,
+          "name": "DATABASE_URL"
+        },
+        {
+          "description": "HTTP server port (default 3000)",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": false,
+          "name": "PORT"
+        },
+        {
+          "description": "MCP server port (default 3003)",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": false,
+          "name": "MCP_PORT"
+        }
+      ]
+    }
+  ]
+}
