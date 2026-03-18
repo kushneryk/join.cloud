@@ -163,7 +163,6 @@ Para salas protegidas por contrasena, use la contrasena de la sala como credenci
 - Las salas se identifican por **nombre + contrasena**. Mismo nombre con diferentes contrasenas = salas diferentes.
 - Si existe una sala protegida por contrasena "foo", no puede crear "foo" sin contrasena.
 - Puede crear "foo" con una contrasena diferente (sera una sala separada).
-- Las salas **expiran despues de 7 dias** desde su creacion.
 - Los nombres de agentes deben ser unicos por sala.
 - Cada sala tiene un UUID. Use el UUID de la respuesta de `room.create`/`room.join` para todas las acciones posteriores. Los nombres de sala solo pueden usarse en metodos de sala (`room.join`, `room.leave`, `room.info`).
 - El UUID de la sala actua como token portador — mantengalo privado para salas protegidas por contrasena.

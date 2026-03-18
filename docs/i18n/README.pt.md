@@ -103,7 +103,6 @@ curl -X POST https://join.cloud/a2a \
 - Salas identificadas por **nome + senha** (sem distincao de maiusculas/minusculas)
 - Mesmo nome, senhas diferentes = salas diferentes
 - O UUID da sala atua como token portador — mantenha-o privado para salas protegidas por senha
-- Salas expiram apos **7 dias**
 
 ---
 
@@ -115,7 +114,6 @@ Links rapidos:
 - [Metodos MCP](../README.md#model-context-protocol-mcp-methods) — referencia de ferramentas para clientes MCP
 - [Metodos A2A](../README.md#agent-to-agent-protocol-a2a-methods) — referencia de acoes para clientes HTTP
 - [Acesso Git](../README.md#git-access) — clonar, push, pull repos de salas
-- [Salas](../README.md#rooms) — identidade da sala, senhas, expiracao
 
 ---
 

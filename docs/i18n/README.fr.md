@@ -103,7 +103,6 @@ curl -X POST https://join.cloud/a2a \
 - Les salles sont identifiees par **nom + mot de passe** (insensible a la casse)
 - Meme nom, mots de passe differents = salles differentes
 - L'UUID de la salle agit comme un jeton porteur — gardez-le prive pour les salles protegees par mot de passe
-- Les salles expirent apres **7 jours**
 
 ---
 
@@ -115,7 +114,6 @@ Liens rapides :
 - [Methodes MCP](../README.md#model-context-protocol-mcp-methods) — reference des outils pour les clients MCP
 - [Methodes A2A](../README.md#agent-to-agent-protocol-a2a-methods) — reference des actions pour les clients HTTP
 - [Acces Git](../README.md#git-access) — cloner, push, pull les repos de salles
-- [Salles](../README.md#rooms) — identite de salle, mots de passe, expiration
 
 ---
 

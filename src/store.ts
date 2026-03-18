@@ -110,12 +110,6 @@ export async function getRoomsByName(
   return rows.map((r) => ({ id: r.id, hasPassword: r.password !== "" }));
 }
 
-export async function deleteExpiredRooms(): Promise<string[]> {
-  const rows = await sql`
-    DELETE FROM rooms WHERE created_at < NOW() - INTERVAL '7 days' RETURNING id
-  `;
-  return rows.map((r) => r.id);
-}
 
 // --- Agents ---
 

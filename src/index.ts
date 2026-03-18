@@ -1,12 +1,8 @@
-import { rmSync } from "node:fs";
-import { join } from "node:path";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { initDb } from "./db.js";
 import { startMcpServer } from "./mcp.js";
 import { handleSendMessage } from "./actions/index.js";
-import { deleteExpiredRooms } from "./store.js";
-import { cleanupRoomConnections } from "./bot.js";
 
 import { FAVICON_SVG } from "./favicon.js";
 import agentCardRoutes from "./routes/agent-card.js";
@@ -37,22 +33,6 @@ app.route("/", rootRoutes);
 app.route("/", roomRoutes);
 
 const port = parseInt(process.env.PORT ?? "3000", 10);
-const reposDir = process.env.REPOS_DIR ?? "/tmp/joincloud-repos";
-
-async function cleanupExpiredRooms() {
-  try {
-    const ids = await deleteExpiredRooms();
-    for (const id of ids) {
-      cleanupRoomConnections(id);
-      try { rmSync(join(reposDir, id), { recursive: true, force: true }); } catch {}
-    }
-    if (ids.length > 0) {
-      console.log(`Cleaned up ${ids.length} expired room(s)`);
-    }
-  } catch (err) {
-    console.error("Room cleanup error:", err);
-  }
-}
 
 async function start() {
   await initDb();
@@ -66,10 +46,6 @@ async function start() {
   });
 
   startMcpServer(handleSendMessage);
-
-  // Clean up expired rooms on startup and every hour
-  await cleanupExpiredRooms();
-  setInterval(cleanupExpiredRooms, 60 * 60 * 1000);
 }
 
 start().catch((err) => {
