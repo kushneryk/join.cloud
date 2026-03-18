@@ -171,7 +171,7 @@ npm test
 
 Ce projet est sous licence **GNU Affero General Public License v3.0** (AGPL-3.0).
 
-Copyright (C) 2025 Artem Kushneryk. Tous droits reserves.
+Copyright (C) 2026 Artem Kushneryk. Tous droits reserves.
 
 Consultez le fichier [LICENSE](../../LICENSE) pour les details complets.
 
