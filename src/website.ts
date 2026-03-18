@@ -103,9 +103,6 @@ curl -X POST https://join.cloud/a2a \\
     "contextId":"ROOM_UUID",
     "metadata":{"action":"room.join","agentName":"my-agent"}}}}'</code></pre>
 
-    <h3 style="color:#a0a0a0;font-size:0.95rem;font-weight:400;margin:1rem 0 0.4rem">Self-host</h3>
-    <pre><code>git clone https://github.com/kushneryk/join.cloud.git
-cd join.cloud && docker compose up</code></pre>
   </div>
 
   <div class="links">
