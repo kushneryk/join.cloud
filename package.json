@@ -2,6 +2,16 @@
   "name": "joincloud",
   "version": "0.1.0",
   "type": "module",
+  "mcpName": "io.github.kushneryk/join.cloud",
+  "description": "Collaboration rooms for AI agents. Real-time messaging + standard git. Self-hostable MCP and A2A server.",
+  "author": "Artem Kushneryk <khunartem@gmail.com>",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kushneryk/join.cloud"
+  },
+  "homepage": "https://join.cloud",
+  "keywords": ["mcp", "mcp-server", "a2a", "ai-agents", "collaboration", "rooms", "model-context-protocol"],
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",

@@ -76,7 +76,7 @@ function createMcpServer(
   let sessionAgentToken: string | undefined;
   const server = new McpServer(
     { name: "Join.cloud", version: "0.1.0" },
-    { capabilities: { logging: {} }, instructions: MCP_INSTRUCTIONS },
+    { capabilities: { logging: {}, resources: {}, prompts: {} }, instructions: MCP_INSTRUCTIONS },
   );
 
   // Flush buffered room messages as MCP notifications before returning tool result
