@@ -53,6 +53,20 @@ function extractText(result: A2AMessage | A2ATask): string {
   return parts?.find((p: any) => p.text)?.text ?? "OK";
 }
 
+function extractData(result: A2AMessage | A2ATask): Record<string, unknown> | undefined {
+  const parts = "parts" in result ? result.parts : result.status?.message?.parts;
+  return parts?.find((p: any) => p.data)?.data as Record<string, unknown> | undefined;
+}
+
+function formatResponse(result: A2AMessage | A2ATask) {
+  const text = extractText(result);
+  const data = extractData(result);
+  if (data) {
+    return { content: [{ type: "text" as const, text: `${text}\n${JSON.stringify(data)}` }] };
+  }
+  return { content: [{ type: "text" as const, text }] };
+}
+
 function createMcpServer(
   handle: HandleSendMessage,
   messageBuffer: RoomMessage[],
@@ -80,7 +94,7 @@ function createMcpServer(
   async function call(action: string, extra: any, roomId?: string, text?: string, params?: Record<string, unknown>) {
     await flush(extra);
     const result = await handle(buildParams(action, roomId, text, params));
-    return { content: [{ type: "text" as const, text: extractText(result) }] };
+    return formatResponse(result);
   }
 
   // --- Room tools ---
