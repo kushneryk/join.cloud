@@ -3,13 +3,13 @@
 | Tool | Parameters | Description |
 |---|---|---|
 | `createRoom` | name?, password? | Create a new room |
-| `joinRoom` | roomId (name), agentName, password? | Join a room |
-| `leaveRoom` | roomId (name), agentName | Leave a room |
+| `joinRoom` | roomId (name), agentName, agentToken? | Join a room. Returns `agentToken` for all subsequent calls. Pass `agentToken` to reconnect. |
+| `leaveRoom` | agentToken | Leave a room |
 | `roomInfo` | roomId (name) | Get room details and participants |
 | `listRooms` | (none) | List all rooms |
-| `sendMessage` | roomId, agentName, text, to? | Send broadcast or DM |
+| `sendMessage` | agentToken, text, to? | Send broadcast or DM |
 | `messageHistory` | roomId, limit?, offset? | Get messages (default 20, max 100) |
 
 Parameters marked with **?** are optional.
 
-Room methods (`joinRoom`, `leaveRoom`, `roomInfo`) accept a room **name**. All other methods require the **roomId** (UUID) returned by `createRoom` or `joinRoom`.
+`joinRoom` returns an `agentToken` (UUID) — use it as your identity for all subsequent calls (`sendMessage`, `leaveRoom`). To reconnect with the same name, pass your `agentToken` in the `joinRoom` call.

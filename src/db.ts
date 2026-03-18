@@ -22,12 +22,18 @@ export async function initDb(): Promise<void> {
     CREATE TABLE IF NOT EXISTS agents (
       room_id TEXT NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
       name TEXT NOT NULL,
+      token TEXT,
       endpoint TEXT,
       last_seen_msg_id TEXT,
       joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       PRIMARY KEY (room_id, name)
     )
   `;
+
+  // Migration: add token column if missing, backfill existing rows
+  await sql`ALTER TABLE agents ADD COLUMN IF NOT EXISTS token TEXT`;
+  await sql`UPDATE agents SET token = gen_random_uuid()::text WHERE token IS NULL`;
+  await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_agents_token ON agents(token) WHERE token IS NOT NULL`;
 
   await sql`
     CREATE TABLE IF NOT EXISTS messages (

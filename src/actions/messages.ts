@@ -1,7 +1,7 @@
 import type { A2AMessage } from "../a2a.js";
 import type { RoomMessage } from "../types.js";
 import { reply, error, replyWithCatchUp } from "../helpers.js";
-import { getRoomById, addMessage, getRoomMessages } from "../store.js";
+import { getRoomById, addMessage, getRoomMessages, getAgentByToken } from "../store.js";
 import { broadcastToRoom } from "../bot.js";
 
 export async function handleMessageAction(
@@ -12,26 +12,31 @@ export async function handleMessageAction(
   metadata: Record<string, unknown> | undefined,
 ): Promise<A2AMessage | null> {
   if (action === "message.send") {
-    if (!contextId) return error("contextId (roomId) required");
-    if (!agentName) return error("agentName required in metadata");
-    const room = await getRoomById(contextId);
-    if (!room) return error(`Room not found: ${contextId}`);
+    const agentToken = metadata?.agentToken as string | undefined;
+    if (!agentToken) return error("agentToken required in metadata");
+
+    const agent = await getAgentByToken(agentToken);
+    if (!agent) return error("Invalid agentToken");
+
+    const roomId = agent.roomId;
+    const room = await getRoomById(roomId);
+    if (!room) return error(`Room not found: ${roomId}`);
 
     const to = metadata?.to as string | undefined;
 
     const roomMsg: RoomMessage = {
       id: crypto.randomUUID(),
-      roomId: contextId,
-      from: agentName,
+      roomId,
+      from: agent.name,
       to,
       body: text,
       timestamp: new Date().toISOString(),
     };
 
     await addMessage(roomMsg);
-    await broadcastToRoom(contextId, roomMsg);
+    await broadcastToRoom(roomId, roomMsg);
 
-    return replyWithCatchUp("Message sent", contextId, agentName);
+    return replyWithCatchUp("Message sent", roomId, agent.name);
   }
 
   if (action === "message.history") {
@@ -51,12 +56,17 @@ export async function handleDefaultChat(
   text: string,
   contextId: string | undefined,
   agentName: string | undefined,
+  metadata: Record<string, unknown> | undefined,
 ): Promise<A2AMessage | null> {
-  if (contextId && agentName) {
+  const agentToken = metadata?.agentToken as string | undefined;
+  if (contextId && agentToken) {
+    const agent = await getAgentByToken(agentToken);
+    if (!agent) return error("Invalid agentToken");
+
     const roomMsg: RoomMessage = {
       id: crypto.randomUUID(),
       roomId: contextId,
-      from: agentName,
+      from: agent.name,
       body: text,
       timestamp: new Date().toISOString(),
     };

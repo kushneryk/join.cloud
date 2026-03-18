@@ -59,6 +59,7 @@ async function buildRoom(row: Record<string, any>): Promise<Room> {
   for (const a of agents) {
     agentMap.set(a.name, {
       name: a.name,
+      token: a.token,
       endpoint: a.endpoint ?? undefined,
       joinedAt: a.joined_at.toISOString(),
     });
@@ -122,16 +123,38 @@ export async function addAgent(
   roomId: string,
   name: string,
   endpoint?: string,
-): Promise<void> {
+): Promise<string> {
+  const token = crypto.randomUUID();
   await sql`
-    INSERT INTO agents (room_id, name, endpoint)
-    VALUES (${roomId}, ${name}, ${endpoint ?? null})
-    ON CONFLICT (room_id, name) DO UPDATE SET endpoint = ${endpoint ?? null}
+    INSERT INTO agents (room_id, name, token, endpoint)
+    VALUES (${roomId}, ${name}, ${token}, ${endpoint ?? null})
   `;
+  return token;
+}
+
+export async function getAgentToken(roomId: string, name: string): Promise<string | null> {
+  const rows = await sql`SELECT token FROM agents WHERE room_id = ${roomId} AND name = ${name}`;
+  return rows[0]?.token ?? null;
+}
+
+export async function updateAgentEndpoint(token: string, endpoint?: string): Promise<void> {
+  await sql`UPDATE agents SET endpoint = ${endpoint ?? null} WHERE token = ${token}`;
+}
+
+export async function getAgentByToken(token: string): Promise<{ roomId: string; name: string; endpoint?: string } | undefined> {
+  const rows = await sql`SELECT room_id, name, endpoint FROM agents WHERE token = ${token}`;
+  if (rows.length === 0) return undefined;
+  return { roomId: rows[0].room_id, name: rows[0].name, endpoint: rows[0].endpoint ?? undefined };
 }
 
 export async function removeAgent(roomId: string, name: string): Promise<void> {
   await sql`DELETE FROM agents WHERE room_id = ${roomId} AND name = ${name}`;
+}
+
+export async function removeAgentByToken(token: string): Promise<{ roomId: string; name: string } | undefined> {
+  const rows = await sql`DELETE FROM agents WHERE token = ${token} RETURNING room_id, name`;
+  if (rows.length === 0) return undefined;
+  return { roomId: rows[0].room_id, name: rows[0].name };
 }
 
 export async function updateAgentLastSeen(
@@ -192,6 +215,7 @@ export async function getRoomAgents(roomId: string): Promise<Agent[]> {
   const rows = await sql`SELECT * FROM agents WHERE room_id = ${roomId}`;
   return rows.map((a) => ({
     name: a.name,
+    token: a.token,
     endpoint: a.endpoint ?? undefined,
     joinedAt: a.joined_at.toISOString(),
   }));

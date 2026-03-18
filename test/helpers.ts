@@ -59,5 +59,11 @@ export async function createRoom(name?: string, password?: string) {
 }
 
 export async function joinRoom(roomId: string, agentName: string, extra?: Record<string, unknown>) {
-  return a2a("room.join", roomId, "", { agentName, ...extra });
+  const res = await a2a("room.join", roomId, "", { agentName, ...extra });
+  const data = resultData(res);
+  return { ...res, agentToken: data?.agentToken };
+}
+
+export function getToken(joinRes: any): string {
+  return joinRes.agentToken ?? resultData(joinRes)?.agentToken;
 }

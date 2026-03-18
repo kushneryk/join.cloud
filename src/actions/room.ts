@@ -5,9 +5,12 @@ import {
   getRoom,
   listRooms as storeListRooms,
   addAgent,
-  removeAgent,
+  removeAgentByToken,
   checkRoomPassword,
   agentExistsInRoom,
+  getAgentToken,
+  updateAgentEndpoint,
+  getAgentByToken,
   getRoomsByName,
 } from "../store.js";
 import { botNotify } from "../bot.js";
@@ -19,6 +22,7 @@ export async function handleRoomAction(
   metadata: Record<string, unknown> | undefined,
 ): Promise<A2AMessage | null> {
   const agentName = metadata?.agentName as string | undefined;
+  const agentToken = metadata?.agentToken as string | undefined;
   const agentEndpoint = metadata?.agentEndpoint as string | undefined;
 
   if (action === "room.create") {
@@ -26,13 +30,11 @@ export async function handleRoomAction(
     const name = (text || roomId).toLowerCase();
     const password = metadata?.password as string | undefined;
 
-    // Reserved names (used for doc pages)
     const RESERVED = ["a2a", "mcp", "docs"];
     if (RESERVED.includes(name.toLowerCase())) {
       return error(`Room name "${name}" is reserved.`);
     }
 
-    // Validate name:password uniqueness rules
     const existing = await getRoomsByName(name);
     if (existing.length > 0) {
       if (!password && existing.some((r) => r.hasPassword)) {
@@ -67,30 +69,44 @@ export async function handleRoomAction(
     if (!passOk) return error("Invalid room password");
 
     const exists = await agentExistsInRoom(contextId, agentName);
-    await addAgent(contextId, agentName, agentEndpoint);
 
-    if (!exists) {
-      await botNotify(contextId, `${agentName} joined the room`);
+    if (exists) {
+      // Name taken — check if this is a reconnection with correct token
+      const existingToken = await getAgentToken(contextId, agentName);
+      if (!agentToken || agentToken !== existingToken) {
+        return error(`Agent name "${agentName}" is already taken in this room. If you own this name, use your agentToken to reconnect.`);
+      }
+      // Reconnection — update endpoint
+      await updateAgentEndpoint(agentToken, agentEndpoint);
+      return replyWithCatchUp(`Reconnected to room ${contextId} as ${agentName}`, contextId, agentName, {
+        roomId: contextId,
+        agentName,
+        agentToken: existingToken,
+      });
     }
+
+    // New agent — create and get token
+    const token = await addAgent(contextId, agentName, agentEndpoint);
+    await botNotify(contextId, `${agentName} joined the room`);
 
     return replyWithCatchUp(`Joined room ${contextId} as ${agentName}`, contextId, agentName, {
       roomId: contextId,
       agentName,
+      agentToken: token,
     });
   }
 
   if (action === "room.leave") {
-    if (!contextId) return error("contextId (roomId) required");
-    const room = await getRoom(contextId);
-    if (!room) return error(`Room not found: ${contextId}`);
-    if (!agentName) return error("agentName required in metadata");
+    if (!agentToken) return error("agentToken required in metadata");
 
-    if (!room.agents.has(agentName)) return error(`Agent "${agentName}" is not in this room`);
+    const agent = await getAgentByToken(agentToken);
+    if (!agent) return error("Invalid agentToken");
 
-    await removeAgent(contextId, agentName);
-    await botNotify(contextId, `${agentName} left the room`);
+    const removed = await removeAgentByToken(agentToken);
+    if (!removed) return error("Failed to leave room");
 
-    return reply(`Left room ${contextId}`, contextId);
+    await botNotify(agent.roomId, `${agent.name} left the room`);
+    return reply(`Left room ${agent.roomId}`, agent.roomId);
   }
 
   if (action === "room.info") {

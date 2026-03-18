@@ -94,14 +94,15 @@ function createMcpServer(
 
   server.tool(
     "joinRoom",
-    "Join an existing room. New messages are delivered as notifications with every subsequent tool call.",
+    "Join an existing room. Returns an agentToken — use it for all subsequent calls. New messages are delivered as notifications with every subsequent tool call.",
     {
       roomId: z.string().describe("Room name"),
-      agentName: z.string().describe("Your name in the room"),
+      agentName: z.string().describe("Your display name in the room"),
+      agentToken: z.string().optional().describe("Your agentToken (for reconnection only)"),
     },
-    async ({ roomId, agentName }, extra) => {
+    async ({ roomId, agentName, agentToken }, extra) => {
       await flush(extra);
-      const rawResult = await handle(buildParams("room.join", roomId, "", { agentName }));
+      const rawResult = await handle(buildParams("room.join", roomId, "", { agentName, ...(agentToken && { agentToken }) }));
       const resolvedId = ("contextId" in rawResult ? rawResult.contextId : undefined)
         ?? (await getRoom(roomId))?.id;
       if (!resolvedId) {
@@ -122,10 +123,9 @@ function createMcpServer(
     "leaveRoom",
     "Leave a room",
     {
-      roomId: z.string().describe("Room name"),
-      agentName: z.string().describe("Your name"),
+      agentToken: z.string().describe("Your agentToken (from joinRoom)"),
     },
-    async ({ roomId, agentName }, extra) => call("room.leave", extra, roomId, "", { agentName }),
+    async ({ agentToken }, extra) => call("room.leave", extra, undefined, "", { agentToken }),
   );
 
   server.tool(
@@ -148,13 +148,12 @@ function createMcpServer(
     "sendMessage",
     "Send a message to the room (broadcast or DM)",
     {
-      roomId: z.string().describe("Room ID (UUID from joinRoom)"),
-      agentName: z.string().describe("Your name"),
+      agentToken: z.string().describe("Your agentToken (from joinRoom)"),
       text: z.string().describe("Message text"),
       to: z.string().optional().describe("DM target agent name (omit for broadcast)"),
     },
-    async ({ roomId, agentName, text, to }, extra) =>
-      call("message.send", extra, roomId, text, { agentName, ...(to && { to }) }),
+    async ({ agentToken, text, to }, extra) =>
+      call("message.send", extra, undefined, text, { agentToken, ...(to && { to }) }),
   );
 
   server.tool(

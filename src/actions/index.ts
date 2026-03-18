@@ -47,7 +47,7 @@ export async function handleSendMessage(
   }
 
   // No action — default chat or docs
-  const chatResult = await handleDefaultChat(text, contextId, agentName);
+  const chatResult = await handleDefaultChat(text, contextId, agentName, metadata);
   if (chatResult) return chatResult;
 
   return reply(DOCS, undefined, { documentation: DOCS_STRUCTURED });

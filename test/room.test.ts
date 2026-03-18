@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { a2a, resultText, resultData, isError, uniqueName, createRoom, joinRoom } from "./helpers.js";
+import { a2a, resultText, resultData, isError, uniqueName, createRoom, joinRoom, getToken } from "./helpers.js";
 
 describe("room.create", () => {
   it("creates a room with a name", async () => {
@@ -37,16 +37,19 @@ describe("room.create", () => {
 });
 
 describe("room.join", () => {
-  it("joins an existing room", async () => {
+  it("joins and returns agentToken", async () => {
     const { roomId } = await createRoom();
     const res = await joinRoom(roomId, "agent1");
     expect(resultText(res)).toContain("Joined");
+    expect(res.agentToken).toBeDefined();
+    expect(res.agentToken.length).toBeGreaterThan(10);
   });
 
   it("joins by room name", async () => {
     const { name } = await createRoom();
     const res = await joinRoom(name, "agent1");
     expect(resultText(res)).toContain("Joined");
+    expect(res.agentToken).toBeDefined();
   });
 
   it("rejects join without agentName", async () => {
@@ -60,37 +63,48 @@ describe("room.join", () => {
     expect(isError(res)).toBe(true);
   });
 
-  it("allows reconnection with same agent name", async () => {
+  it("allows reconnection with same name and correct token", async () => {
+    const { roomId } = await createRoom();
+    const first = await joinRoom(roomId, "agent1");
+    const token = first.agentToken;
+    const res = await joinRoom(roomId, "agent1", { agentToken: token });
+    expect(isError(res)).toBe(false);
+    expect(resultText(res)).toContain("Reconnected");
+  });
+
+  it("rejects reconnection with same name but wrong token", async () => {
+    const { roomId } = await createRoom();
+    await joinRoom(roomId, "agent1");
+    const res = await joinRoom(roomId, "agent1", { agentToken: "wrong-token" });
+    expect(isError(res)).toBe(true);
+    expect(resultText(res)).toContain("already taken");
+  });
+
+  it("rejects reconnection with same name but no token", async () => {
     const { roomId } = await createRoom();
     await joinRoom(roomId, "agent1");
     const res = await joinRoom(roomId, "agent1");
-    expect(isError(res)).toBe(false);
-    expect(resultText(res)).toContain("Joined");
+    expect(isError(res)).toBe(true);
+    expect(resultText(res)).toContain("already taken");
   });
 });
 
 describe("room.leave", () => {
-  it("leaves a room", async () => {
+  it("leaves a room with token", async () => {
     const { roomId } = await createRoom();
-    await joinRoom(roomId, "agent1");
-    const res = await a2a("room.leave", roomId, "", { agentName: "agent1" });
+    const join = await joinRoom(roomId, "agent1");
+    const res = await a2a("room.leave", undefined, "", { agentToken: join.agentToken });
     expect(resultText(res)).toContain("Left");
   });
 
-  it("rejects leave without agentName", async () => {
+  it("rejects leave without token", async () => {
     const { roomId } = await createRoom();
     const res = await a2a("room.leave", roomId, "");
     expect(isError(res)).toBe(true);
   });
 
-  it("rejects leave from nonexistent room", async () => {
-    const res = await a2a("room.leave", "nonexistent-xyz", "", { agentName: "agent1" });
-    expect(isError(res)).toBe(true);
-  });
-
-  it("rejects leave if not in room", async () => {
-    const { roomId } = await createRoom();
-    const res = await a2a("room.leave", roomId, "", { agentName: "ghost" });
+  it("rejects leave with invalid token", async () => {
+    const res = await a2a("room.leave", undefined, "", { agentToken: "invalid-token" });
     expect(isError(res)).toBe(true);
   });
 });
@@ -120,32 +134,6 @@ describe("room.info", () => {
 
   it("rejects nonexistent room", async () => {
     const res = await a2a("room.info", "nonexistent-xyz");
-    expect(isError(res)).toBe(true);
-  });
-});
-
-describe("room methods accept names, others require UUID", () => {
-  it("room.info accepts name", async () => {
-    const { name } = await createRoom();
-    const res = await a2a("room.info", name);
-    expect(isError(res)).toBe(false);
-  });
-
-  it("message.send rejects room name", async () => {
-    const { name, roomId } = await createRoom();
-    await joinRoom(roomId, "agent1");
-    const res = await a2a("message.send", name, "hello", { agentName: "agent1" });
-    expect(isError(res)).toBe(true);
-  });
-
-  it("git.commit rejects room name", async () => {
-    const { name, roomId } = await createRoom();
-    await joinRoom(roomId, "dev");
-    const res = await a2a("git.commit", name, "", {
-      agentName: "dev",
-      commitMessage: "test",
-      changes: [{ path: "f.txt", content: "x" }],
-    });
     expect(isError(res)).toBe(true);
   });
 });

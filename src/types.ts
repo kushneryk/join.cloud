@@ -9,6 +9,7 @@ export interface Room {
 
 export interface Agent {
   name: string;
+  token: string;
   endpoint?: string; // A2A endpoint to push messages to this agent
   joinedAt: string;
 }
