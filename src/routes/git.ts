@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { spawn, execSync } from "node:child_process";
 import { getRoom, getRoomsByName, getRoomByNameAndPassword } from "../store.js";
 import { initRepo, repoDir, REPOS_DIR } from "../git.js";
+import { botNotify } from "../bot.js";
 
 const app = new Hono();
 
@@ -15,6 +16,26 @@ function parseBasicAuth(header: string | undefined): { user: string; pass: strin
   const colon = decoded.indexOf(":");
   if (colon === -1) return null;
   return { user: decoded.slice(0, colon), pass: decoded.slice(colon + 1) };
+}
+
+function getNewCommits(repoPath: string, oldSha: string, newSha: string): Array<{ sha: string; author: string; message: string }> {
+  if (oldSha === "0000000000000000000000000000000000000000") {
+    // New branch — get last few commits
+    try {
+      const log = execSync(`git log --format="%H|%an|%s" -5 ${newSha}`, { cwd: repoPath, encoding: "utf-8" }).trim();
+      return log.split("\n").filter(Boolean).map((line) => {
+        const [sha, author, ...msg] = line.split("|");
+        return { sha: sha.slice(0, 8), author, message: msg.join("|") };
+      });
+    } catch { return []; }
+  }
+  try {
+    const log = execSync(`git log --format="%H|%an|%s" ${oldSha}..${newSha}`, { cwd: repoPath, encoding: "utf-8" }).trim();
+    return log.split("\n").filter(Boolean).map((line) => {
+      const [sha, author, ...msg] = line.split("|");
+      return { sha: sha.slice(0, 8), author, message: msg.join("|") };
+    });
+  } catch { return []; }
 }
 
 async function handleGitRequest(c: any, roomSlug: string, pathInfo: string, service?: string): Promise<Response> {
@@ -119,7 +140,42 @@ app.post("/rooms/:slug/git-upload-pack", async (c) => {
 // POST /rooms/:slug/git-receive-pack (push)
 app.post("/rooms/:slug/git-receive-pack", async (c) => {
   const slug = c.req.param("slug");
-  return handleGitRequest(c, slug, "/git-receive-pack");
+
+  // Capture refs before push by reading current HEAD
+  const room = await getRoom(slug);
+  const refsBeforePush: Record<string, string> = {};
+  if (room) {
+    try {
+      const refs = execSync("git for-each-ref --format='%(refname) %(objectname)'", { cwd: repoDir(room.id), encoding: "utf-8" }).trim();
+      for (const line of refs.split("\n").filter(Boolean)) {
+        const [ref, sha] = line.split(" ");
+        refsBeforePush[ref] = sha;
+      }
+    } catch {}
+  }
+
+  const response = await handleGitRequest(c, slug, "/git-receive-pack");
+
+  // After successful push, detect new commits and notify room
+  if (room && response.status === 200) {
+    try {
+      const refsAfter = execSync("git for-each-ref --format='%(refname) %(objectname)'", { cwd: repoDir(room.id), encoding: "utf-8" }).trim();
+      for (const line of refsAfter.split("\n").filter(Boolean)) {
+        const [ref, newSha] = line.split(" ");
+        const oldSha = refsBeforePush[ref] ?? "0000000000000000000000000000000000000000";
+        if (newSha !== oldSha) {
+          const branch = ref.replace("refs/heads/", "");
+          const commits = getNewCommits(repoDir(room.id), oldSha, newSha);
+          if (commits.length > 0) {
+            const summary = commits.map((c) => `  ${c.sha} ${c.message} (${c.author})`).join("\n");
+            botNotify(room.id, `Git push to ${branch} — ${commits.length} commit(s):\n${summary}`).catch(() => {});
+          }
+        }
+      }
+    } catch {}
+  }
+
+  return response;
 });
 
 export default app;
