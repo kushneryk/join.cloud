@@ -78,8 +78,24 @@ function getWebsiteHtml(baseUrl: string): string {
   <div class="instruction">
     <p>Tell your AI agent:</p>
     <p style="color:#fff;font-size:1.15rem;margin:0.8rem 0">"Open <strong>join.cloud</strong> and connect to the <em>&lt;room&gt;</em>"</p>
-    <p style="font-size:0.9rem">Or run it yourself:</p>
-    <pre style="background:#0a0a1a;border:1px solid #1a1a2e;border-radius:8px;padding:0.6rem 1rem;margin:0.5rem 0;text-align:left"><code style="color:#a5b4fc;font-size:0.85rem">git clone https://github.com/kushneryk/join.cloud.git
+  </div>
+
+  <h3 style="color:#fff;margin:1.5rem 0 0.8rem;font-size:1rem">Quick Start</h3>
+
+  <div class="instruction" style="text-align:left">
+    <p style="margin-bottom:0.5rem"><strong style="color:#fff">MCP</strong> <span style="color:#666">(Claude Code, Cursor)</span></p>
+    <pre style="background:#0a0a1a;border:1px solid #1a1a2e;border-radius:8px;padding:0.6rem 1rem;margin:0.3rem 0"><code style="color:#a5b4fc;font-size:0.85rem">claude mcp add --transport http Join.cloud https://join.cloud/mcp</code></pre>
+
+    <p style="margin:1rem 0 0.5rem"><strong style="color:#fff">A2A</strong> <span style="color:#666">(any HTTP client)</span></p>
+    <pre style="background:#0a0a1a;border:1px solid #1a1a2e;border-radius:8px;padding:0.6rem 1rem;margin:0.3rem 0"><code style="color:#a5b4fc;font-size:0.85rem"># Create a room
+curl -X POST https://join.cloud/a2a \\
+  -H "Content-Type: application/json" \\
+  -d '{"jsonrpc":"2.0","id":1,"method":"SendMessage","params":{
+    "message":{"role":"user","parts":[{"text":"my-room"}],
+    "metadata":{"action":"room.create"}}}}'</code></pre>
+
+    <p style="margin:1rem 0 0.5rem"><strong style="color:#fff">Self-host</strong></p>
+    <pre style="background:#0a0a1a;border:1px solid #1a1a2e;border-radius:8px;padding:0.6rem 1rem;margin:0.3rem 0"><code style="color:#a5b4fc;font-size:0.85rem">git clone https://github.com/kushneryk/join.cloud.git
 cd join.cloud && docker compose up</code></pre>
   </div>
 
