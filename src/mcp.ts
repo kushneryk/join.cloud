@@ -72,6 +72,8 @@ function createMcpServer(
   messageBuffer: RoomMessage[],
   addCleanup: (fn: () => void) => void,
 ): McpServer {
+  // Session-level state: track agentToken after joinRoom
+  let sessionAgentToken: string | undefined;
   const server = new McpServer(
     { name: "Join.cloud", version: "0.1.0" },
     { capabilities: { logging: {} }, instructions: MCP_INSTRUCTIONS },
@@ -117,10 +119,16 @@ function createMcpServer(
     async ({ roomId, agentName, agentToken }, extra) => {
       await flush(extra);
       const rawResult = await handle(buildParams("room.join", roomId, "", { agentName, ...(agentToken && { agentToken }) }));
+      const data = extractData(rawResult);
       const resolvedId = ("contextId" in rawResult ? rawResult.contextId : undefined)
         ?? (await getRoom(roomId))?.id;
       if (!resolvedId) {
-        return { content: [{ type: "text" as const, text: extractText(rawResult) }] };
+        return formatResponse(rawResult);
+      }
+
+      // Store agentToken in session state for auto-injection
+      if (data?.agentToken) {
+        sessionAgentToken = data.agentToken as string;
       }
 
       // Subscribe to room messages — buffer for delivery on next tool call
@@ -129,17 +137,18 @@ function createMcpServer(
       });
       addCleanup(cleanup);
 
-      return { content: [{ type: "text" as const, text: extractText(rawResult) }] };
+      return formatResponse(rawResult);
     },
   );
 
   server.tool(
     "leaveRoom",
-    "Leave a room",
-    {
-      agentToken: z.string().describe("Your agentToken (from joinRoom)"),
+    "Leave the room you joined",
+    {},
+    async (_args, extra) => {
+      if (!sessionAgentToken) return { content: [{ type: "text" as const, text: "Error: Not joined to any room. Call joinRoom first." }] };
+      return call("room.leave", extra, undefined, "", { agentToken: sessionAgentToken });
     },
-    async ({ agentToken }, extra) => call("room.leave", extra, undefined, "", { agentToken }),
   );
 
   server.tool(
@@ -160,14 +169,15 @@ function createMcpServer(
 
   server.tool(
     "sendMessage",
-    "Send a message to the room (broadcast or DM)",
+    "Send a message to the room (broadcast or DM). Must call joinRoom first.",
     {
-      agentToken: z.string().describe("Your agentToken (from joinRoom)"),
       text: z.string().describe("Message text"),
       to: z.string().optional().describe("DM target agent name (omit for broadcast)"),
     },
-    async ({ agentToken, text, to }, extra) =>
-      call("message.send", extra, undefined, text, { agentToken, ...(to && { to }) }),
+    async ({ text, to }, extra) => {
+      if (!sessionAgentToken) return { content: [{ type: "text" as const, text: "Error: Not joined to any room. Call joinRoom first." }] };
+      return call("message.send", extra, undefined, text, { agentToken: sessionAgentToken, ...(to && { to }) });
+    },
   );
 
   server.tool(
