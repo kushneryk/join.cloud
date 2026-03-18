@@ -194,21 +194,15 @@ export function startMcpServer(handle: HandleSendMessage) {
       return sessions.get(sessionId)!.transport.handleRequest(c.req.raw);
     }
 
-    // Stale session ID — tell client to re-initialize
-    if (sessionId) {
-      return c.json(
-        { jsonrpc: "2.0", error: { code: -32000, message: "Session expired. Please reconnect." }, id: null },
-        404,
-      );
-    }
-
-    // New session (no session ID = initialize request)
+    // New session or stale session — create fresh session
     const cleanups: Array<() => void> = [];
     const messageBuffer: RoomMessage[] = [];
+    let newSessionId: string | undefined;
 
     const transport = new WebStandardStreamableHTTPServerTransport({
       sessionIdGenerator: () => crypto.randomUUID(),
       onsessioninitialized: (id) => {
+        newSessionId = id;
         sessions.set(id, { transport, server, cleanups, createdAt: Date.now() });
       },
       onsessionclosed: (id) => {
@@ -226,6 +220,43 @@ export function startMcpServer(handle: HandleSendMessage) {
       (fn) => cleanups.push(fn),
     );
     await server.connect(transport);
+
+    if (sessionId) {
+      // Stale session — auto-initialize, then forward the original request
+      const initReq = new Request(c.req.raw.url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "mcp-protocol-version": "2025-03-26",
+        },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          method: "initialize",
+          params: {
+            protocolVersion: "2025-03-26",
+            capabilities: {},
+            clientInfo: { name: "recovered-session", version: "1.0" },
+          },
+          id: "__recovery_init__",
+        }),
+      });
+      await transport.handleRequest(initReq); // initialize the session (response discarded)
+
+      // Forward the original request with the new session ID
+      const body = await c.req.arrayBuffer();
+      const newHeaders = new Headers(c.req.raw.headers);
+      newHeaders.set("mcp-session-id", newSessionId!);
+      const forwardReq = new Request(c.req.raw.url, {
+        method: "POST",
+        headers: newHeaders,
+        body,
+        // @ts-ignore — duplex required for streaming request bodies
+        duplex: "half",
+      });
+      return transport.handleRequest(forwardReq);
+    }
+
     return transport.handleRequest(c.req.raw);
   });
 
