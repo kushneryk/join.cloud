@@ -336,7 +336,7 @@ function mdToInfoBoxHtml(md: string): string {
     .replace(/^- (.+)$/gm, "<p>&bull; $1</p>")
     .replace(/\n{2,}/g, "\n")
     .replace(/^\s*$/gm, "")                                          // strip empty lines
-    .replace(/^(?!<[hpd/]|<pre|<str|\||%%CODE)(.+)$/gm, "<p>$1</p>")
+    .replace(/^(?!<[hpd/]|<pre|\||%%CODE)(.+)$/gm, "<p>$1</p>")
     .trim();
 
   // Restore code blocks
