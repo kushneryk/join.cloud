@@ -319,19 +319,32 @@ export function getMcpDocs(): string {
 }
 
 function mdToInfoBoxHtml(md: string): string {
-  return md
+  // First pass: extract code blocks and replace with placeholders
+  const codeBlocks: string[] = [];
+  let processed = md.replace(/^```[\w]*\n([\s\S]*?)^```/gm, (_m, code) => {
+    codeBlocks.push(`<pre><code>${esc(code.trim())}</code></pre>`);
+    return `%%CODEBLOCK_${codeBlocks.length - 1}%%`;
+  });
+
+  processed = processed
     .replace(/^# .+$/gm, "")                                        // strip h1
     .replace(/^## (.+)$/gm, `</div><h2 style="margin-top:1.5rem">$1</h2><div class="info-box">`)
     .replace(/^### (.+)$/gm, "<p><strong>$1</strong></p>")
-    .replace(/```[\w]*\n([\s\S]*?)```/g, (_m, code) => `<pre><code>${esc(code.trim())}</code></pre>`)
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/^\| .+$/gm, (line) => line)                           // tables pass through for now
     .replace(/^- (.+)$/gm, "<p>&bull; $1</p>")
     .replace(/\n{2,}/g, "\n")
     .replace(/^\s*$/gm, "")                                          // strip empty lines
-    .replace(/^(?!<[hpd/]|<pre|<str|\|)(.+)$/gm, "<p>$1</p>")
+    .replace(/^(?!<[hpd/]|<pre|<str|\||%%CODE)(.+)$/gm, "<p>$1</p>")
     .trim();
+
+  // Restore code blocks
+  for (let i = 0; i < codeBlocks.length; i++) {
+    processed = processed.replace(`%%CODEBLOCK_${i}%%`, codeBlocks[i]);
+  }
+
+  return processed;
 }
 
 function esc(s: string): string {
