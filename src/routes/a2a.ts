@@ -73,7 +73,6 @@ app.post("/a2a", async (c) => {
           { name: "rpc.discover", description: "This method — service discovery" },
         ],
         actions: DOCS_STRUCTURED.actions,
-        verifyOptions: DOCS_STRUCTURED.verify_options,
         endpoints: {
           a2a: "POST /a2a",
           mcp: "POST /mcp",

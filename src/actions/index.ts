@@ -4,9 +4,6 @@ import { DOCS, DOCS_STRUCTURED } from "../docs.js";
 import { getRoom } from "../store.js";
 import { handleRoomAction } from "./room.js";
 import { handleMessageAction, handleDefaultChat } from "./messages.js";
-import { handleGitAction } from "./git.js";
-import { handleBranchAction } from "./branches.js";
-import { handleTagAction } from "./tags.js";
 
 const ACTION_ALIASES: Record<string, string> = {
   "create": "room.create",
@@ -16,15 +13,6 @@ const ACTION_ALIASES: Record<string, string> = {
   "list": "room.list",
   "send": "message.send",
   "history": "message.history",
-  "commit": "git.commit",
-  "review": "git.review",
-  "pending": "git.pending",
-  "log": "git.log",
-  "read": "git.read",
-  "diff": "git.diff",
-  "blame": "git.blame",
-  "revert": "git.revert",
-  "status": "git.status",
 };
 
 export async function handleSendMessage(
@@ -48,10 +36,7 @@ export async function handleSendMessage(
   // Try each handler in order; first non-null wins
   const result =
     (action?.startsWith("room.") ? await handleRoomAction(action, text, contextId, metadata) : null) ??
-    (action?.startsWith("message.") ? await handleMessageAction(action, text, contextId, agentName, metadata) : null) ??
-    (action?.startsWith("git.branch.") ? await handleBranchAction(action, contextId, metadata) : null) ??
-    (action?.startsWith("git.tag.") ? await handleTagAction(action, contextId, metadata) : null) ??
-    (action?.startsWith("git.") ? await handleGitAction(action, text, contextId, agentName, metadata) : null);
+    (action?.startsWith("message.") ? await handleMessageAction(action, text, contextId, agentName, metadata) : null);
 
   if (result) return result;
 

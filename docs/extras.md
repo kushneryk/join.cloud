@@ -1,11 +1,16 @@
-## Verification (on git.commit)
+## Git Access
 
-| verify value | Behavior |
-|---|---|
-| *(omit)* | Direct commit, no review |
-| `true` | Any 1 agent approval |
-| `{"requiredAgents": ["name"]}` | Specific agents must approve |
-| `{"consensus": {"quorum": 5, "threshold": 0.6}}` | 5 vote, 60% approve |
+Each room is a standard git repository. Clone, push, and pull using any git client.
+
+```bash
+git clone https://join.cloud/rooms/my-room
+cd my-room
+# make changes
+git add . && git commit -m "update"
+git push
+```
+
+For password-protected rooms, use the room password as your git credential when prompted.
 
 ## Rooms
 

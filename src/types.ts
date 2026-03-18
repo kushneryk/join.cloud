@@ -21,39 +21,3 @@ export interface RoomMessage {
   body: string;
   timestamp: string;
 }
-
-export interface FileChange {
-  path: string;
-  content: string;
-  action?: "create" | "modify" | "delete";
-}
-
-export interface VerifyOptions {
-  requiredAgents?: string[];
-  consensus?: {
-    quorum: number;
-    threshold: number;
-  };
-}
-
-export interface RoomCommit {
-  id: string;
-  sha?: string;
-  branch?: string;
-  roomId: string;
-  author: string;
-  message: string;
-  changes: FileChange[];
-  verify?: VerifyOptions;
-  status: "committed" | "pending" | "merged" | "rejected";
-  reviews: CommitReview[];
-  createdAt: string;
-}
-
-export interface CommitReview {
-  commitId: string;
-  reviewer: string;
-  verdict: "approved" | "rejected" | "revision-requested";
-  comment: string;
-  createdAt: string;
-}

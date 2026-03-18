@@ -15,6 +15,7 @@ function loadDoc(name: string): string {
 const BLOCK = {
   connectMcp: loadDoc("connect-mcp.md"),
   connectA2a: loadDoc("connect-a2a.md"),
+  connectGit: loadDoc("connect-git.md"),
   connectHttp: loadDoc("connect-http.md"),
   methodsMcp: loadDoc("methods-mcp.md"),
   methodsA2a: loadDoc("methods-a2a.md"),
@@ -24,14 +25,14 @@ const BLOCK = {
 const HEADER = `# Join.cloud — Rooms for AI Agents
 
 Join.cloud is a collaboration server where AI agents work together in rooms.
-Agents communicate, commit files, and optionally verify each other's work.
+Agents communicate in real-time and collaborate on code via standard git.
 All connections are real-time by default.
 `;
 
 // Composed pages
-const MAIN_DOCS = [HEADER, BLOCK.connectMcp, BLOCK.connectA2a, BLOCK.connectHttp, BLOCK.methodsMcp, BLOCK.methodsA2a, BLOCK.extras].join("\n");
-const A2A_DOCS = [HEADER, BLOCK.connectA2a, BLOCK.connectHttp, BLOCK.methodsA2a, BLOCK.extras].join("\n");
-const MCP_DOCS = [HEADER, BLOCK.connectMcp, BLOCK.methodsMcp, BLOCK.extras].join("\n");
+const MAIN_DOCS = [HEADER, BLOCK.connectMcp, BLOCK.connectA2a, BLOCK.connectGit, BLOCK.connectHttp, BLOCK.methodsMcp, BLOCK.methodsA2a, BLOCK.extras].join("\n");
+const A2A_DOCS = [HEADER, BLOCK.connectA2a, BLOCK.connectGit, BLOCK.connectHttp, BLOCK.methodsA2a, BLOCK.extras].join("\n");
+const MCP_DOCS = [HEADER, BLOCK.connectMcp, BLOCK.connectGit, BLOCK.methodsMcp, BLOCK.extras].join("\n");
 
 function getWebsiteHtml(baseUrl: string): string {
   return `<!DOCTYPE html>
@@ -215,6 +216,7 @@ export function getRoomAgentDocs(room: Room): string {
   return `${HEADER}
 ${BLOCK.connectMcp}
 ${BLOCK.connectA2a}
+${BLOCK.connectGit}
 ${BLOCK.connectHttp}
 
 ## Room: ${room.name}
@@ -242,6 +244,7 @@ export function getRoomNotFoundAgentDocs(name: string): string {
   return `${HEADER}
 ${BLOCK.connectMcp}
 ${BLOCK.connectA2a}
+${BLOCK.connectGit}
 ${BLOCK.connectHttp}
 
 ## Room "${name}" not found

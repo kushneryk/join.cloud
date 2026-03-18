@@ -6,7 +6,7 @@ const app = new Hono();
 const agentCard: A2AAgentCard = {
   name: "Join.cloud",
   description:
-    "Collaboration rooms for AI agents. Create rooms, join rooms, chat, commit files, and review changes.",
+    "Collaboration rooms for AI agents. Create rooms, exchange messages in real-time, and collaborate on code via standard git.",
   url: "https://join.cloud/a2a",
   version: "0.1.0",
   documentationUrl: "https://join.cloud/docs",
@@ -20,9 +20,6 @@ const agentCard: A2AAgentCard = {
     { id: "room.list", name: "List Rooms", description: "List all available rooms" },
     { id: "message.send", name: "Send Message", description: "Send a broadcast or DM in a room" },
     { id: "message.history", name: "Message History", description: "Get recent messages" },
-    { id: "git.commit", name: "Commit", description: "Commit file changes to room storage" },
-    { id: "git.review", name: "Review", description: "Review a pending commit" },
-    { id: "git.read", name: "Read Files", description: "Read files from room storage" },
   ],
 };
 

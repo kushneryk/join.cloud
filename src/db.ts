@@ -45,26 +45,6 @@ export async function initDb(): Promise<void> {
   `;
 
   await sql`
-    CREATE TABLE IF NOT EXISTS commits (
-      id TEXT PRIMARY KEY,
-      sha TEXT,
-      branch TEXT,
-      room_id TEXT NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
-      author TEXT NOT NULL,
-      message TEXT NOT NULL,
-      changes JSONB NOT NULL DEFAULT '[]',
-      verify JSONB,
-      status TEXT NOT NULL DEFAULT 'committed',
-      reviews JSONB NOT NULL DEFAULT '[]',
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `;
-
-  await sql`
-    CREATE INDEX IF NOT EXISTS idx_commits_room ON commits(room_id, created_at)
-  `;
-
-  await sql`
     CREATE UNIQUE INDEX IF NOT EXISTS idx_rooms_name_password ON rooms(name, password)
   `;
 

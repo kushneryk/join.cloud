@@ -1,4 +1,4 @@
-import type { Room, RoomMessage, RoomCommit, Agent } from "./types.js";
+import type { Room, RoomMessage, Agent } from "./types.js";
 import { sql } from "./db.js";
 
 // --- Rooms ---
@@ -229,79 +229,3 @@ export async function getRoomMessages(
   }));
 }
 
-// --- Commits ---
-
-export async function addCommit(commit: RoomCommit): Promise<void> {
-  await sql`
-    INSERT INTO commits (id, sha, branch, room_id, author, message, changes, verify, status, reviews)
-    VALUES (
-      ${commit.id},
-      ${commit.sha ?? null},
-      ${commit.branch ?? null},
-      ${commit.roomId},
-      ${commit.author},
-      ${commit.message},
-      ${JSON.stringify(commit.changes)},
-      ${commit.verify ? JSON.stringify(commit.verify) : null},
-      ${commit.status},
-      ${JSON.stringify(commit.reviews)}
-    )
-  `;
-}
-
-export async function updateCommit(commit: RoomCommit): Promise<void> {
-  await sql`
-    UPDATE commits
-    SET status = ${commit.status},
-        reviews = ${JSON.stringify(commit.reviews)}
-    WHERE id = ${commit.id}
-  `;
-}
-
-export async function getCommit(
-  roomId: string,
-  commitId: string,
-): Promise<RoomCommit | undefined> {
-  const rows = await sql`
-    SELECT * FROM commits WHERE room_id = ${roomId} AND id = ${commitId}
-  `;
-  if (rows.length === 0) return undefined;
-  return rowToCommit(rows[0]);
-}
-
-export async function getRoomCommits(roomId: string): Promise<RoomCommit[]> {
-  const rows = await sql`
-    SELECT * FROM commits WHERE room_id = ${roomId} ORDER BY created_at
-  `;
-  return rows.map(rowToCommit);
-}
-
-export async function getPendingCommits(roomId: string): Promise<RoomCommit[]> {
-  const rows = await sql`
-    SELECT * FROM commits WHERE room_id = ${roomId} AND status = 'pending' ORDER BY created_at
-  `;
-  return rows.map(rowToCommit);
-}
-
-export async function getMergedCommits(roomId: string): Promise<RoomCommit[]> {
-  const rows = await sql`
-    SELECT * FROM commits WHERE room_id = ${roomId} AND status IN ('committed', 'merged') ORDER BY created_at
-  `;
-  return rows.map(rowToCommit);
-}
-
-function rowToCommit(r: Record<string, any>): RoomCommit {
-  return {
-    id: r.id,
-    sha: r.sha ?? undefined,
-    branch: r.branch ?? undefined,
-    roomId: r.room_id,
-    author: r.author,
-    message: r.message,
-    changes: typeof r.changes === "string" ? JSON.parse(r.changes) : r.changes,
-    verify: typeof r.verify === "string" ? JSON.parse(r.verify) : r.verify ?? undefined,
-    status: r.status,
-    reviews: typeof r.reviews === "string" ? JSON.parse(r.reviews) : r.reviews,
-    createdAt: r.created_at.toISOString(),
-  };
-}

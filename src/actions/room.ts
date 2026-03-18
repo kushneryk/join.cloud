@@ -11,7 +11,6 @@ import {
   getRoomsByName,
 } from "../store.js";
 import { botNotify } from "../bot.js";
-import { listFiles, getPendingCommits } from "../git.js";
 
 export async function handleRoomAction(
   action: string,
@@ -109,8 +108,6 @@ export async function handleRoomAction(
         name: a.name,
         joinedAt: a.joinedAt,
       })),
-      fileCount: (await listFiles(contextId)).length,
-      pendingCommits: (await getPendingCommits(contextId)).length,
     };
 
     return reply(JSON.stringify(info, null, 2), contextId, info);

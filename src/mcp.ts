@@ -130,7 +130,7 @@ function createMcpServer(
 
   server.tool(
     "roomInfo",
-    "Get room details — participants, file count, pending commits",
+    "Get room details — participants and info",
     { roomId: z.string().describe("Room name") },
     async ({ roomId }, extra) => call("room.info", extra, roomId),
   );
@@ -167,87 +167,6 @@ function createMcpServer(
     },
     async ({ roomId, limit, offset }, extra) =>
       call("message.history", extra, roomId, "", { ...(limit && { limit }), ...(offset && { offset }) }),
-  );
-
-  // --- Git tools ---
-
-  server.tool(
-    "commit",
-    "Commit file changes to room storage. Omit verify for direct commit, include for review.",
-    {
-      roomId: z.string().describe("Room ID (UUID from joinRoom)"),
-      agentName: z.string().describe("Your name"),
-      message: z.string().describe("Commit message"),
-      changes: z.array(z.object({
-        path: z.string().describe("File path"),
-        content: z.string().describe("File content"),
-      })).describe("Files to create/modify"),
-      verify: z.union([
-        z.boolean(),
-        z.object({
-          requiredAgents: z.array(z.string()).optional(),
-          consensus: z.object({
-            quorum: z.number(),
-            threshold: z.number(),
-          }).optional(),
-        }),
-      ]).optional().describe("Verification: omit=direct, true=any 1 approval, object=custom rules"),
-    },
-    async ({ roomId, agentName, message, changes, verify }, extra) =>
-      call("git.commit", extra, roomId, "", {
-        agentName,
-        commitMessage: message,
-        changes,
-        ...(verify !== undefined && { verify }),
-      }),
-  );
-
-  server.tool(
-    "review",
-    "Review a pending commit",
-    {
-      roomId: z.string().describe("Room ID (UUID from joinRoom)"),
-      agentName: z.string().describe("Your name"),
-      commitId: z.string().describe("Commit ID to review"),
-      verdict: z.enum(["approved", "rejected", "revision-requested"]).describe("Your verdict"),
-      comment: z.string().optional().describe("Review comment"),
-    },
-    async ({ roomId, agentName, commitId, verdict, comment }, extra) =>
-      call("git.review", extra, roomId, "", { agentName, commitId, verdict, comment: comment ?? "" }),
-  );
-
-  server.tool(
-    "listPending",
-    "List pending commits awaiting review",
-    { roomId: z.string().describe("Room ID (UUID from joinRoom)") },
-    async ({ roomId }, extra) => call("git.pending", extra, roomId),
-  );
-
-  server.tool(
-    "gitLog",
-    "View commit history",
-    { roomId: z.string().describe("Room ID (UUID from joinRoom)") },
-    async ({ roomId }, extra) => call("git.log", extra, roomId),
-  );
-
-  server.tool(
-    "readFile",
-    "Read a file from room storage. Omit path to list all files.",
-    {
-      roomId: z.string().describe("Room ID (UUID from joinRoom)"),
-      path: z.string().optional().describe("File path (omit to list files)"),
-    },
-    async ({ roomId, path }, extra) => call("git.read", extra, roomId, "", { ...(path && { path }) }),
-  );
-
-  server.tool(
-    "viewCommit",
-    "View a specific commit's details and changes",
-    {
-      roomId: z.string().describe("Room ID (UUID from joinRoom)"),
-      commitId: z.string().describe("Commit ID"),
-    },
-    async ({ roomId, commitId }, extra) => call("git.diff", extra, roomId, "", { commitId }),
   );
 
   return server;
