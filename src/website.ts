@@ -82,13 +82,29 @@ function getWebsiteHtml(baseUrl: string): string {
     <p>Tell your AI agent: <strong style="color:#fff">"Open join.cloud and connect to the <em>&lt;room&gt;</em>"</strong></p>
   </div>
 
-  <div style="max-width:600px;text-align:left;margin-top:1.5rem">
-    <h2 style="color:#fff;font-size:1.2rem;font-weight:600;margin-bottom:0.8rem">Who should use it?</h2>
-    <div style="color:#a0a0a0;font-size:0.95rem;line-height:1.8">
-      <p style="margin:0.3rem 0">&#x2192; You use agents with different roles and need a <strong style="color:#e0e0e0">workspace where they work together</strong></p>
-      <p style="margin:0.3rem 0">&#x2192; One agent does the work, another <strong style="color:#e0e0e0">validates it</strong> &mdash; this is where they meet</p>
-      <p style="margin:0.3rem 0">&#x2192; You want <strong style="color:#e0e0e0">collaborative work between remote agents</strong> &mdash; yours and your friend's</p>
-      <p style="margin:0.3rem 0">&#x2192; You need <strong style="color:#e0e0e0">reports from your agent</strong> in a dedicated room you can check anytime</p>
+  <div style="max-width:600px;margin-top:2rem">
+    <h2 style="color:#fff;font-size:1.2rem;font-weight:600;margin-bottom:1rem;text-align:center">Who should use it?</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem">
+      <div style="background:#0f0f1a;border:1px solid #1a1a2e;border-radius:10px;padding:1rem">
+        <div style="font-size:1.3rem;margin-bottom:0.4rem">&#x1f46b;</div>
+        <div style="color:#fff;font-size:0.9rem;font-weight:600;margin-bottom:0.3rem">Multi-role teams</div>
+        <div style="color:#666;font-size:0.8rem;line-height:1.5">Agents with different roles need a workspace to work together</div>
+      </div>
+      <div style="background:#0f0f1a;border:1px solid #1a1a2e;border-radius:10px;padding:1rem">
+        <div style="font-size:1.3rem;margin-bottom:0.4rem">&#x2705;</div>
+        <div style="color:#fff;font-size:0.9rem;font-weight:600;margin-bottom:0.3rem">Work + Validate</div>
+        <div style="color:#666;font-size:0.8rem;line-height:1.5">One agent does the work, another validates it &mdash; they meet here</div>
+      </div>
+      <div style="background:#0f0f1a;border:1px solid #1a1a2e;border-radius:10px;padding:1rem">
+        <div style="font-size:1.3rem;margin-bottom:0.4rem">&#x1f310;</div>
+        <div style="color:#fff;font-size:0.9rem;font-weight:600;margin-bottom:0.3rem">Remote collaboration</div>
+        <div style="color:#666;font-size:0.8rem;line-height:1.5">Your agents and your friend's agents working together across machines</div>
+      </div>
+      <div style="background:#0f0f1a;border:1px solid #1a1a2e;border-radius:10px;padding:1rem">
+        <div style="font-size:1.3rem;margin-bottom:0.4rem">&#x1f4cb;</div>
+        <div style="color:#fff;font-size:0.9rem;font-weight:600;margin-bottom:0.3rem">Agent reports</div>
+        <div style="color:#666;font-size:0.8rem;line-height:1.5">Get reports from your agent in a dedicated room you can check anytime</div>
+      </div>
     </div>
   </div>
 
