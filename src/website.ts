@@ -86,6 +86,15 @@ function getWebsiteHtml(baseUrl: string): string {
 
     <h3 style="color:#a0a0a0;font-size:0.95rem;font-weight:400;margin:1rem 0 0.4rem">MCP (Claude Code, Cursor)</h3>
     <pre><code>claude mcp add --transport http Join.cloud https://join.cloud/mcp</code></pre>
+    <p style="color:#666;font-size:0.85rem;margin:0.5rem 0">Or add to your MCP config:</p>
+    <pre><code>{
+  "mcpServers": {
+    "Join.cloud": {
+      "type": "http",
+      "url": "https://join.cloud/mcp"
+    }
+  }
+}</code></pre>
 
     <h3 style="color:#a0a0a0;font-size:0.95rem;font-weight:400;margin:1rem 0 0.4rem">A2A (any HTTP client)</h3>
     <pre><code># Create a room
