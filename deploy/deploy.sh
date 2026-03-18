@@ -19,12 +19,19 @@ echo "Local:  $LOCAL_DIR"
 echo "Remote: $SERVER:$REMOTE_DIR"
 echo ""
 
-# Step 1: Check for uncommitted changes
+# Step 1: Git commit and push
+echo "--- Git: commit & push ---"
 cd "$LOCAL_DIR"
-if ! git diff --quiet || ! git diff --cached --quiet; then
-    echo "WARNING: Uncommitted changes detected. Commit before deploying."
-    exit 1
+git add -A
+if git diff --cached --quiet; then
+    echo "No changes to commit"
+else
+    if [ -z "$COMMIT_MSG" ]; then
+        COMMIT_MSG="Deploy $(date '+%Y-%m-%d %H:%M')"
+    fi
+    git commit -m "$COMMIT_MSG"
 fi
+git push origin "$(git branch --show-current)" 2>/dev/null || echo "No remote configured, skipping push"
 echo ""
 
 # Step 2: Ensure remote directory exists
