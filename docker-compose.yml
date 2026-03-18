@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: joincloud
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+      - "3003:3003"
+    environment:
+      DATABASE_URL: postgres://postgres@db:5432/joincloud
+      PORT: "3000"
+      MCP_PORT: "3003"
+      REPOS_DIR: /tmp/joincloud-repos
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

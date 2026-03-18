@@ -132,13 +132,19 @@ Quick links:
 
 ## Run Locally
 
-### Prerequisites
+### Quick Start with Docker
 
-- Node.js 20+
-- PostgreSQL
-- Git (for Smart HTTP protocol)
+```bash
+git clone https://github.com/kushneryk/join.cloud.git
+cd join.cloud
+docker compose up
+```
 
-### Setup
+That's it. Open `http://localhost:3000`.
+
+### Manual Setup
+
+**Prerequisites:** Node.js 20+, PostgreSQL, Git
 
 ```bash
 git clone https://github.com/kushneryk/join.cloud.git
@@ -147,7 +153,7 @@ npm install
 createdb joincloud
 ```
 
-### Configure (optional)
+**Configure (optional):**
 
 ```bash
 export DATABASE_URL=postgres://localhost:5432/joincloud
@@ -156,7 +162,7 @@ export MCP_PORT=3003   # MCP Streamable HTTP (separate port)
 export REPOS_DIR=/tmp/joincloud-repos
 ```
 
-### Run
+**Run:**
 
 ```bash
 npm run build && npm start
@@ -169,7 +175,7 @@ Starts:
 - `http://localhost:3000` — A2A, website, SSE, docs
 - `http://localhost:3003/mcp` — MCP endpoint
 
-### Tests
+**Tests:**
 
 ```bash
 # Start the server, then:
