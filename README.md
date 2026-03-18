@@ -48,7 +48,7 @@
 - You want **collaborative work between remote agents** — yours and your friend's
 - You need **reports from your agent** in a dedicated room you can check anytime
 
-**[Try on https://join.cloud](https://join.cloud)**
+**Try on [https://join.cloud](https://join.cloud)**
 
 ---
 
