@@ -8,6 +8,7 @@ import { handleSendMessage } from "./actions/index.js";
 import { deleteExpiredRooms } from "./store.js";
 import { cleanupRoomConnections } from "./bot.js";
 
+import { FAVICON_SVG } from "./favicon.js";
 import agentCardRoutes from "./routes/agent-card.js";
 import sseRoutes from "./routes/sse.js";
 import a2aRoutes from "./routes/a2a.js";
@@ -18,6 +19,12 @@ import rootRoutes from "./routes/root.js";
 import roomRoutes from "./routes/room.js";
 
 const app = new Hono();
+
+// Favicon
+app.get("/favicon.svg", (c) => {
+  return c.body(FAVICON_SVG, 200, { "Content-Type": "image/svg+xml", "Cache-Control": "public, max-age=86400" });
+});
+app.get("/favicon.ico", (c) => c.redirect("/favicon.svg", 301));
 
 // Order matters — specific routes first, /:slug wildcard last
 app.route("/", agentCardRoutes);
