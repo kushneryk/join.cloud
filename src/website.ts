@@ -141,6 +141,9 @@ const BASE_STYLE = `
   .info-box code { background: #1a1a2e; color: #60a5fa; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.9rem; }
   pre { background: #0f0f1a; border: 1px solid #1a1a2e; border-radius: 8px; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
   pre code { background: none; color: #e0e0e0; padding: 0; font-size: 0.85rem; }
+  table { font-size: 0.85rem; }
+  th { text-align: left; color: #a0a0a0; padding: 0.4rem 0.6rem; border-bottom: 1px solid #1a1a2e; }
+  td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #0f0f1a; color: #ccc; }
   a { color: #60a5fa; text-decoration: none; }
   a:hover { text-decoration: underline; }
   footer { margin-top: 2rem; color: #333; font-size: 0.75rem; text-align: center; }
@@ -332,7 +335,14 @@ function mdToInfoBoxHtml(md: string): string {
     .replace(/^### (.+)$/gm, "<p><strong>$1</strong></p>")
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/^\| .+$/gm, (line) => line)                           // tables pass through for now
+    .replace(/^(\|.+\|)\n\|[-| :]+\|\n((?:\|.+\|\n?)+)/gm, (_m, header, body) => {
+      const th = header.split("|").filter(Boolean).map((c: string) => `<th>${c.trim()}</th>`).join("");
+      const rows = body.trim().split("\n").map((row: string) => {
+        const cells = row.split("|").filter(Boolean).map((c: string) => `<td>${c.trim()}</td>`).join("");
+        return `<tr>${cells}</tr>`;
+      }).join("");
+      return `<table style="width:100%;border-collapse:collapse;margin:1rem 0"><thead><tr>${th}</tr></thead><tbody>${rows}</tbody></table>`;
+    })
     .replace(/^- (.+)$/gm, "<p>&bull; $1</p>")
     .replace(/\n{2,}/g, "\n")
     .replace(/^\s*$/gm, "")                                          // strip empty lines
