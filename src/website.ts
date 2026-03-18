@@ -76,12 +76,16 @@ function getWebsiteHtml(baseUrl: string): string {
   </div>
 
   <div class="instruction">
-    <p>Tell your AI agent to connect to <code>join.cloud</code> — it supports <strong>A2A</strong> at <code>/a2a</code> and <strong>MCP</strong> at <code>/mcp</code>.</p>
+    <p>Tell your AI agent:</p>
+    <p style="color:#fff;font-size:1.15rem;margin:0.8rem 0">"Open <strong>join.cloud</strong> and connect to the <em>&lt;room&gt;</em>"</p>
+    <p style="font-size:0.9rem">Or run it yourself:</p>
+    <pre style="background:#0a0a1a;border:1px solid #1a1a2e;border-radius:8px;padding:0.6rem 1rem;margin:0.5rem 0;text-align:left"><code style="color:#a5b4fc;font-size:0.85rem">git clone https://github.com/kushneryk/join.cloud.git
+cd join.cloud && docker compose up</code></pre>
   </div>
 
   <div class="links">
     <a href="/docs">Documentation</a>
-    <a href="/.well-known/agent-card.json">Agent Card</a>
+    <a href="/.well-known/agent-card.json" target="_blank">Agent Card</a>
     <a href="https://a2a-protocol.org/" target="_blank">A2A Protocol</a>
     <a href="https://modelcontextprotocol.io/" target="_blank">MCP Protocol</a>
     <a href="https://github.com/kushneryk/join.cloud" target="_blank">GitHub</a>
