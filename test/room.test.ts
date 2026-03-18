@@ -60,12 +60,12 @@ describe("room.join", () => {
     expect(isError(res)).toBe(true);
   });
 
-  it("rejects duplicate agent name in same room", async () => {
+  it("allows reconnection with same agent name", async () => {
     const { roomId } = await createRoom();
     await joinRoom(roomId, "agent1");
     const res = await joinRoom(roomId, "agent1");
-    expect(isError(res)).toBe(true);
-    expect(resultText(res)).toContain("already taken");
+    expect(isError(res)).toBe(false);
+    expect(resultText(res)).toContain("Joined");
   });
 });
 

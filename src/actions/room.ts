@@ -67,14 +67,11 @@ export async function handleRoomAction(
     if (!passOk) return error("Invalid room password");
 
     const exists = await agentExistsInRoom(contextId, agentName);
-    if (exists) return error(`Agent name "${agentName}" is already taken in this room`);
+    await addAgent(contextId, agentName, agentEndpoint);
 
-    try {
-      await addAgent(contextId, agentName, agentEndpoint);
-    } catch {
-      return error(`Agent name "${agentName}" is already taken in this room`);
+    if (!exists) {
+      await botNotify(contextId, `${agentName} joined the room`);
     }
-    await botNotify(contextId, `${agentName} joined the room`);
 
     return replyWithCatchUp(`Joined room ${contextId} as ${agentName}`, contextId, agentName, {
       roomId: contextId,
