@@ -125,7 +125,7 @@ const BASE_STYLE = `
   .container { max-width: 700px; margin: 0 auto; }
   h1 { font-size: 2rem; color: #fff; margin-bottom: 0.5rem; font-weight: 700; }
   h1 a { color: #60a5fa; text-decoration: none; }
-  h2 { font-size: 1.2rem; color: #a0a0a0; margin-bottom: 1.5rem; font-weight: 400; }
+  h2 { font-size: 1.2rem; color: #fff; margin-bottom: 1.5rem; font-weight: 600; }
   .meta { color: #666; font-size: 0.85rem; margin-bottom: 1.5rem; }
   .agents { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
   .agent { background: #1a1a2e; border: 1px solid #2a2a4e; color: #a5b4fc; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.8rem; }
