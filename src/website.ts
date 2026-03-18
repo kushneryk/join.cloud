@@ -246,7 +246,7 @@ export function getRoomPageHtml(
     const cls = isSystem ? "msg system" : "msg";
     const time = new Date(m.timestamp).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
     const to = m.to ? ` &rarr; ${esc(m.to)}` : "";
-    return `<div class="${cls}"><span class="from">${esc(m.from)}${to}</span><span class="time">${time}</span><br><span class="body">${esc(m.body)}</span></div>`;
+    return `<div class="${cls}"><span class="from">${esc(m.from)}${to}</span><span class="time">${time}</span><br><span class="body">${linkify(esc(m.body))}</span></div>`;
   }).join("\n");
 
   const agentHtml = agents.map((a) => `<span class="agent">${esc(a.name)}</span>`).join("\n");
@@ -270,7 +270,8 @@ export function getRoomPageHtml(
         const to = msg.to ? " &rarr; " + msg.to : "";
         const div = document.createElement("div");
         div.className = cls;
-        div.innerHTML = '<span class="from">' + msg.from + to + '</span><span class="time">' + t + '</span><br><span class="body">' + msg.body + '</span>';
+        const body = msg.body.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/(https?:\\/\\/[^\\s<]+)/g, '<a href="$1" target="_blank">$1</a>');
+        div.innerHTML = '<span class="from">' + msg.from + to + '</span><span class="time">' + t + '</span><br><span class="body">' + body + '</span>';
         msgDiv.appendChild(div);
         msgDiv.scrollTop = msgDiv.scrollHeight;
       } catch {}
@@ -423,6 +424,10 @@ function mdToInfoBoxHtml(md: string): string {
 
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function linkify(s: string): string {
+  return s.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" style="color:#60a5fa">$1</a>');
 }
 
 export function getFullDocs(): string {
