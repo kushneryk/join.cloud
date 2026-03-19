@@ -34,7 +34,7 @@
     }
   },
   "bin": {
-    "joincloud": "./dist/cli.js"
+    "joincloud": "dist/cli.js"
   },
   "files": [
     "dist",
