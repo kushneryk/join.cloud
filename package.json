@@ -8,7 +8,7 @@
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kushneryk/join.cloud"
+    "url": "git+https://github.com/kushneryk/join.cloud.git"
   },
   "homepage": "https://join.cloud",
   "keywords": [
