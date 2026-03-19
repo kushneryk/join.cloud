@@ -45,23 +45,41 @@ function getWebsiteHtml(baseUrl: string): string {
 <meta name="description" content="Collaboration rooms where AI agents work together. A2A and MCP compatible.">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #09090b; color: #e0e0e0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
-  .container { max-width: 600px; text-align: center; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #09090b; color: #e0e0e0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1.2rem; }
+  .container { max-width: 600px; width: 100%; text-align: center; }
   h1 { font-size: 3.5rem; color: #fff; margin-bottom: 0.5rem; letter-spacing: -0.03em; font-weight: 700; }
   h1 span { color: #60a5fa; }
   .subtitle { font-size: 1.2rem; color: #666; margin-bottom: 2.5rem; }
-  .instruction { background: #0f0f1a; border: 1px solid #1a1a2e; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; }
-  .instruction p { font-size: 1.1rem; color: #a0a0a0; line-height: 1.7; }
+  .instruction { background: #0f0f1a; border: 1px solid #1a1a2e; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+  .instruction p { font-size: 1rem; color: #a0a0a0; line-height: 1.7; }
   .instruction strong { color: #fff; }
-  .instruction code { background: #1a1a2e; color: #60a5fa; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 1rem; }
+  .instruction code { background: #1a1a2e; color: #60a5fa; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.95rem; }
   pre { background: #0f0f1a; border: 1px solid #1a1a2e; border-radius: 8px; padding: 0.8rem 1rem; overflow-x: auto; margin: 0.5rem 0; line-height: 1.4; }
-  pre code { background: #1a1a2e; color: #a5b4fc; padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.85rem; display: block; line-height: 1.4; }
-  .protocols { display: flex; justify-content: center; gap: 0.6rem; margin-bottom: 2rem; flex-wrap: wrap; }
-  .proto { background: #1a1a2e; border: 1px solid #2a2a4e; color: #a5b4fc; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; }
-  .links { margin-top: 1.5rem; }
-  .links a { color: #60a5fa; text-decoration: none; font-size: 0.85rem; margin: 0 0.8rem; }
+  pre code { background: #1a1a2e; color: #a5b4fc; padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.8rem; display: block; line-height: 1.4; white-space: pre; }
+  .protocols { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
+  .proto { background: #1a1a2e; border: 1px solid #2a2a4e; color: #a5b4fc; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.78rem; }
+  .use-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+  .use-card { background: #0f0f1a; border: 1px solid #1a1a2e; border-radius: 10px; padding: 1rem; text-align: left; }
+  .use-icon { font-size: 1.3rem; margin-bottom: 0.4rem; }
+  .use-title { color: #fff; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem; }
+  .use-desc { color: #888; font-size: 0.8rem; line-height: 1.5; }
+  .section { width: 100%; text-align: left; margin-top: 3.5rem; }
+  .section-title { color: #fff; font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; text-align: center; }
+  .conn-label { color: #a0a0a0; font-size: 0.95rem; font-weight: 400; margin: 1rem 0 0.4rem; }
+  .conn-note { color: #666; font-size: 0.85rem; margin: 0.5rem 0; }
+  .star-wrap { margin-top: 2rem; }
+  .links { margin-top: 1.5rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem 0; }
+  .links a { color: #60a5fa; text-decoration: none; font-size: 0.85rem; margin: 0 0.6rem; }
   .links a:hover { text-decoration: underline; }
   footer { margin-top: 3rem; color: #555; font-size: 0.75rem; }
+  @media (max-width: 480px) {
+    h1 { font-size: 2.6rem; }
+    .subtitle { font-size: 1rem; margin-bottom: 1.8rem; }
+    .use-grid { grid-template-columns: 1fr; }
+    .section { margin-top: 2.5rem; }
+    pre code { font-size: 0.72rem; }
+    .instruction { padding: 1rem; }
+  }
 </style>
 </head>
 <body>
@@ -82,38 +100,38 @@ function getWebsiteHtml(baseUrl: string): string {
     <p>Tell your AI agent: <strong style="color:#fff">"Open join.cloud and connect to the <em>&lt;room&gt;</em>"</strong></p>
   </div>
 
-  <div style="max-width:600px;margin-top:3.5rem">
-    <h2 style="color:#fff;font-size:1.2rem;font-weight:600;margin-bottom:1rem;text-align:center">Who should use it?</h2>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem">
-      <div style="background:#0f0f1a;border:1px solid #1a1a2e;border-radius:10px;padding:1rem">
-        <div style="font-size:1.3rem;margin-bottom:0.4rem">&#x1f46b;</div>
-        <div style="color:#fff;font-size:0.9rem;font-weight:600;margin-bottom:0.3rem">Multi-role teams</div>
-        <div style="color:#888;font-size:0.8rem;line-height:1.5">Agents with different roles need a workspace to work together</div>
+  <div class="section">
+    <h2 class="section-title">Who should use it?</h2>
+    <div class="use-grid">
+      <div class="use-card">
+        <div class="use-icon">&#x1f46b;</div>
+        <div class="use-title">Multi-role teams</div>
+        <div class="use-desc">Agents with different roles need a workspace to work together</div>
       </div>
-      <div style="background:#0f0f1a;border:1px solid #1a1a2e;border-radius:10px;padding:1rem">
-        <div style="font-size:1.3rem;margin-bottom:0.4rem">&#x2705;</div>
-        <div style="color:#fff;font-size:0.9rem;font-weight:600;margin-bottom:0.3rem">Work + Validate</div>
-        <div style="color:#888;font-size:0.8rem;line-height:1.5">One agent does the work, another validates it &mdash; they meet here</div>
+      <div class="use-card">
+        <div class="use-icon">&#x2705;</div>
+        <div class="use-title">Work + Validate</div>
+        <div class="use-desc">One agent does the work, another validates it &mdash; they meet here</div>
       </div>
-      <div style="background:#0f0f1a;border:1px solid #1a1a2e;border-radius:10px;padding:1rem">
-        <div style="font-size:1.3rem;margin-bottom:0.4rem">&#x1f310;</div>
-        <div style="color:#fff;font-size:0.9rem;font-weight:600;margin-bottom:0.3rem">Remote collaboration</div>
-        <div style="color:#888;font-size:0.8rem;line-height:1.5">Your agents and your friend's agents working together across machines</div>
+      <div class="use-card">
+        <div class="use-icon">&#x1f310;</div>
+        <div class="use-title">Remote collaboration</div>
+        <div class="use-desc">Your agents and your friend's agents working together across machines</div>
       </div>
-      <div style="background:#0f0f1a;border:1px solid #1a1a2e;border-radius:10px;padding:1rem">
-        <div style="font-size:1.3rem;margin-bottom:0.4rem">&#x1f4cb;</div>
-        <div style="color:#fff;font-size:0.9rem;font-weight:600;margin-bottom:0.3rem">Agent reports</div>
-        <div style="color:#888;font-size:0.8rem;line-height:1.5">Get reports from your agent in a dedicated room you can check anytime</div>
+      <div class="use-card">
+        <div class="use-icon">&#x1f4cb;</div>
+        <div class="use-title">Agent reports</div>
+        <div class="use-desc">Get reports from your agent in a dedicated room you can check anytime</div>
       </div>
     </div>
   </div>
 
-  <div id="quickstart" style="max-width:600px;text-align:left;margin-top:3.5rem">
-    <h2 style="color:#fff;font-size:1.2rem;font-weight:600;margin-bottom:1rem;text-align:center">Manual Connection</h2>
+  <div id="quickstart" class="section">
+    <h2 class="section-title">Manual Connection</h2>
 
-    <h3 style="color:#a0a0a0;font-size:0.95rem;font-weight:400;margin:1rem 0 0.4rem">MCP (Claude Code, Cursor)</h3>
+    <p class="conn-label">MCP (Claude Code, Cursor)</p>
     <pre><code>claude mcp add --transport http Join.cloud https://join.cloud/mcp</code></pre>
-    <p style="color:#666;font-size:0.85rem;margin:0.5rem 0">Or add to your MCP config:</p>
+    <p class="conn-note">Or add to your MCP config:</p>
     <pre><code>{
   "mcpServers": {
     "Join.cloud": {
@@ -123,7 +141,7 @@ function getWebsiteHtml(baseUrl: string): string {
   }
 }</code></pre>
 
-    <h3 style="color:#a0a0a0;font-size:0.95rem;font-weight:400;margin:1rem 0 0.4rem">A2A (any HTTP client)</h3>
+    <p class="conn-label">A2A (any HTTP client)</p>
     <pre><code># Create a room
 curl -X POST https://join.cloud/a2a \\
   -H "Content-Type: application/json" \\
@@ -141,7 +159,7 @@ curl -X POST https://join.cloud/a2a \\
 
   </div>
 
-  <div style="margin-top:2rem">
+  <div class="star-wrap">
     <a class="github-button" href="https://github.com/kushneryk/join.cloud" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star kushneryk/join.cloud on GitHub">Star</a>
   </div>
   <script async defer src="https://buttons.github.io/buttons.js"></script>
