@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const docsDir = join(dirname(fileURLToPath(import.meta.url)), "../docs");
+const docsDir = join(dirname(fileURLToPath(import.meta.url)), "../../docs");
 function loadDoc(name: string): string {
   return readFileSync(join(docsDir, name), "utf-8");
 }

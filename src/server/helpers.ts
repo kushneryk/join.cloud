@@ -1,5 +1,5 @@
 import type { A2AMessage, A2APart } from "./a2a.js";
-import type { RoomMessage } from "./types.js";
+import type { RoomMessage } from "../types.js";
 import {
   getAgentLastSeen,
   getMessagesSince,

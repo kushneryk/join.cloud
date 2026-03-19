@@ -8,12 +8,12 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { SendMessageParams, A2AMessage, A2ATask } from "./a2a.js";
-import type { RoomMessage } from "./types.js";
+import type { RoomMessage } from "../types.js";
 import { addRoomListener } from "./bot.js";
 import { getRoom } from "./store.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const docsDir = join(__dirname, "../docs");
+const docsDir = join(__dirname, "../../docs");
 const MCP_INSTRUCTIONS = readFileSync(join(docsDir, "connect-mcp.md"), "utf-8");
 
 type HandleSendMessage = (params: SendMessageParams) => Promise<A2AMessage | A2ATask>;
@@ -154,8 +154,11 @@ function createMcpServer(
   server.tool(
     "roomInfo",
     "Get room details — participants and info",
-    { roomId: z.string().describe("Room name") },
-    async ({ roomId }, extra) => call("room.info", extra, roomId),
+    { roomId: z.string().optional().describe("Room name") },
+    async ({ roomId }, extra) => {
+      if (!roomId) return { content: [{ type: "text" as const, text: "Error: roomId is required." }] };
+      return call("room.info", extra, roomId);
+    },
   );
 
   server.tool(
@@ -184,12 +187,14 @@ function createMcpServer(
     "messageHistory",
     "Get message history from the room (default last 20, max 100)",
     {
-      roomId: z.string().describe("Room ID (UUID from joinRoom)"),
+      roomId: z.string().optional().describe("Room ID (UUID from joinRoom)"),
       limit: z.number().optional().describe("Number of messages (default 20, max 100)"),
       offset: z.number().optional().describe("Skip N most recent messages (default 0)"),
     },
-    async ({ roomId, limit, offset }, extra) =>
-      call("message.history", extra, roomId, "", { ...(limit && { limit }), ...(offset && { offset }) }),
+    async ({ roomId, limit, offset }, extra) => {
+      if (!roomId) return { content: [{ type: "text" as const, text: "Error: roomId is required." }] };
+      return call("message.history", extra, roomId, "", { ...(limit && { limit }), ...(offset && { offset }) });
+    },
   );
 
   return server;
@@ -312,4 +317,6 @@ export function startMcpServer(handle: HandleSendMessage) {
       console.error("MCP server error:", err.message);
     }
   });
+
+  return server;
 }

@@ -65,32 +65,33 @@ export async function handleRoomAction(
     if (!agentName) return error("agentName required in metadata");
 
     const password = metadata?.password as string ?? "";
-    const passOk = await checkRoomPassword(contextId, password);
+    const passOk = await checkRoomPassword(room.id, password);
     if (!passOk) return error("Invalid room password");
 
-    const exists = await agentExistsInRoom(contextId, agentName);
+    const roomId = room.id;
+    const exists = await agentExistsInRoom(roomId, agentName);
 
     if (exists) {
       // Name taken — check if this is a reconnection with correct token
-      const existingToken = await getAgentToken(contextId, agentName);
+      const existingToken = await getAgentToken(roomId, agentName);
       if (!agentToken || agentToken !== existingToken) {
         return error(`Agent name "${agentName}" is already taken in this room. If you own this name, use your agentToken to reconnect.`);
       }
       // Reconnection — update endpoint
       await updateAgentEndpoint(agentToken, agentEndpoint);
-      return replyWithCatchUp(`Reconnected to room ${contextId} as ${agentName}`, contextId, agentName, {
-        roomId: contextId,
+      return replyWithCatchUp(`Reconnected to room ${roomId} as ${agentName}`, roomId, agentName, {
+        roomId,
         agentName,
         agentToken: existingToken,
       });
     }
 
     // New agent — create and get token
-    const token = await addAgent(contextId, agentName, agentEndpoint);
-    await botNotify(contextId, `${agentName} joined the room`);
+    const token = await addAgent(roomId, agentName, agentEndpoint);
+    await botNotify(roomId, `${agentName} joined the room`);
 
-    return replyWithCatchUp(`Joined room ${contextId} as ${agentName}`, contextId, agentName, {
-      roomId: contextId,
+    return replyWithCatchUp(`Joined room ${roomId} as ${agentName}`, roomId, agentName, {
+      roomId,
       agentName,
       agentToken: token,
     });

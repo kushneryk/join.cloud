@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
+RUN npm ci
 COPY docs/ docs/
 COPY --from=build /app/dist dist/
 
@@ -24,4 +24,4 @@ ENV REPOS_DIR=/tmp/joincloud-repos
 
 EXPOSE 3000 3003
 
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/server/index.js"]

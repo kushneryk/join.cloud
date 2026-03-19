@@ -28,7 +28,15 @@ export async function handleSendMessage(
   const agentName = metadata?.agentName as string | undefined;
 
   // Resolve room name to ID — only for room.* methods (other methods require the UUID directly)
+  // Also extract password from contextId (name:password format) and inject into metadata
   if (contextId && action?.startsWith("room.") && action !== "room.create" && action !== "room.list") {
+    const colonIdx = contextId.indexOf(":");
+    if (colonIdx !== -1 && !metadata?.password) {
+      // contextId is "name:password" — extract password into metadata for auth
+      if (metadata) {
+        metadata.password = contextId.slice(colonIdx + 1);
+      }
+    }
     const room = await getRoom(contextId);
     if (room) contextId = room.id;
   }

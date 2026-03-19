@@ -1,9 +1,9 @@
 {
   "name": "joincloud",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "mcpName": "io.github.kushneryk/join.cloud",
-  "description": "Collaboration rooms for AI agents. Real-time messaging + standard git. Self-hostable MCP and A2A server.",
+  "description": "Collaboration rooms for AI agents. SDK + self-hostable server with MCP and A2A support.",
   "author": "Artem Kushneryk <khunartem@gmail.com>",
   "license": "AGPL-3.0",
   "repository": {
@@ -11,11 +11,39 @@
     "url": "https://github.com/kushneryk/join.cloud"
   },
   "homepage": "https://join.cloud",
-  "keywords": ["mcp", "mcp-server", "a2a", "ai-agents", "collaboration", "rooms", "model-context-protocol"],
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "a2a",
+    "ai-agents",
+    "collaboration",
+    "rooms",
+    "model-context-protocol",
+    "sdk"
+  ],
+  "main": "./dist/client/index.js",
+  "types": "./dist/client/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/client/index.js",
+      "types": "./dist/client/index.d.ts"
+    },
+    "./server": {
+      "import": "./dist/server/index.js",
+      "types": "./dist/server/index.d.ts"
+    }
+  },
+  "bin": {
+    "joincloud": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "docs"
+  ],
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "tsx watch src/index.ts",
+    "start": "node dist/server/index.js",
+    "dev": "tsx watch src/server/index.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -23,12 +51,13 @@
     "@hono/node-server": "^1",
     "@modelcontextprotocol/sdk": "^1.27.1",
     "hono": "^4",
-    "postgres": "^3.4.8",
+    "sql.js": "^1.14.1",
     "ws": "^8",
     "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/node": "^22",
+    "@types/sql.js": "^1.4.10",
     "@types/ws": "^8",
     "tsx": "^4",
     "typescript": "^5.7",

@@ -1,5 +1,5 @@
 import type { A2AMessage } from "../a2a.js";
-import type { RoomMessage } from "../types.js";
+import type { RoomMessage } from "../../types.js";
 import { reply, error, replyWithCatchUp } from "../helpers.js";
 import { getRoomById, addMessage, getRoomMessages, getAgentByToken } from "../store.js";
 import { broadcastToRoom } from "../bot.js";

@@ -32,23 +32,29 @@ app.route("/", docsRoutes);
 app.route("/", rootRoutes);
 app.route("/", roomRoutes);
 
-const port = parseInt(process.env.PORT ?? "3000", 10);
+export function startServer() {
+  const port = parseInt(process.env.PORT ?? "3000", 10);
 
-async function start() {
-  await initDb();
-  console.log("Database initialized");
-
-  serve({ fetch: app.fetch, port }, () => {
+  const httpServer = serve({ fetch: app.fetch, port }, () => {
     console.log(`Join.cloud server running on port ${port}`);
     console.log(`A2A: POST http://localhost:${port}/a2a`);
     console.log(`MCP docs: GET http://localhost:${port}/mcp`);
     console.log(`SSE: GET http://localhost:${port}/api/messages/:roomId/sse`);
   });
 
-  startMcpServer(handleSendMessage);
+  const mcpServer = startMcpServer(handleSendMessage);
+
+  return { httpServer, mcpServer };
 }
 
-start().catch((err) => {
-  console.error("Failed to start:", err);
-  process.exit(1);
-});
+// Auto-start when run directly (npm start / node dist/server/index.js)
+const isDirectRun = process.argv[1]?.endsWith("server/index.js");
+if (isDirectRun) {
+  initDb().then(() => {
+    console.log("Database initialized");
+    startServer();
+  }).catch((err) => {
+    console.error("Failed to start:", err);
+    process.exit(1);
+  });
+}

@@ -5,7 +5,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const docsDir = join(__dirname, "../docs");
+const docsDir = join(__dirname, "../../docs");
 
 function loadDoc(name: string): string {
   return readFileSync(join(docsDir, name), "utf-8");
@@ -264,8 +264,8 @@ ${body}
 
 // --- Room page ---
 
-import type { Room, RoomMessage } from "./types.js";
-import type { Agent } from "./types.js";
+import type { Room, RoomMessage } from "../types.js";
+import type { Agent } from "../types.js";
 
 export function getRoomPageHtml(
   room: Room,

@@ -1,6 +1,6 @@
 import type { A2AMessage, SendMessageParams } from "./a2a.js";
 import { getRoom, addMessage, updateAgentLastSeen } from "./store.js";
-import type { RoomMessage } from "./types.js";
+import type { RoomMessage } from "../types.js";
 
 // SSE connections: roomId -> set of writers
 type SSEWriter = (data: string) => void;
