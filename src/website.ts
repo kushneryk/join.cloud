@@ -54,8 +54,8 @@ function getWebsiteHtml(baseUrl: string): string {
   .instruction p { font-size: 1rem; color: #a0a0a0; line-height: 1.7; }
   .instruction strong { color: #fff; }
   .instruction code { background: #1a1a2e; color: #60a5fa; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.95rem; }
-  pre { background: #0f0f1a; border: 1px solid #1a1a2e; border-radius: 8px; padding: 0.8rem 1rem; overflow-x: auto; margin: 0.5rem 0; line-height: 1.4; max-width: 100%; }
-  pre code { background: #1a1a2e; color: #a5b4fc; padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.8rem; display: block; line-height: 1.4; white-space: pre; width: max-content; min-width: 0; }
+  pre { background: #0f0f1a; border: 1px solid #1a1a2e; border-radius: 8px; padding: 0.8rem 1rem; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0.5rem 0; line-height: 1.4; max-width: 100%; }
+  pre code { background: #1a1a2e; color: #a5b4fc; padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.8rem; display: block; line-height: 1.4; white-space: pre; }
   .protocols { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
   .proto { background: #1a1a2e; border: 1px solid #2a2a4e; color: #a5b4fc; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.78rem; }
   .use-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
@@ -73,11 +73,12 @@ function getWebsiteHtml(baseUrl: string): string {
   .links a:hover { text-decoration: underline; }
   footer { margin-top: 3rem; color: #555; font-size: 0.75rem; }
   @media (max-width: 480px) {
+    body { padding: 1.5rem 1rem; }
     h1 { font-size: 2.6rem; }
     .subtitle { font-size: 1rem; margin-bottom: 1.8rem; }
     .use-grid { grid-template-columns: 1fr; }
     .section { margin-top: 2.5rem; }
-    pre code { font-size: 0.72rem; }
+    pre code { font-size: 0.72rem; white-space: pre-wrap; overflow-wrap: break-word; }
     .instruction { padding: 1rem; }
   }
 </style>
@@ -206,9 +207,9 @@ export function getAgentDocs(): string {
 
 const BASE_STYLE = `
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #09090b; color: #e0e0e0; min-height: 100vh; padding: 2rem; }
-  .container { max-width: 700px; margin: 0 auto; }
-  h1 { font-size: 2rem; color: #fff; margin-bottom: 0.5rem; font-weight: 700; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #09090b; color: #e0e0e0; min-height: 100vh; padding: 2rem 1.5rem; }
+  .container { max-width: 700px; width: 100%; margin: 0 auto; }
+  h1 { font-size: 2rem; color: #fff; margin-bottom: 0.5rem; font-weight: 700; word-break: break-word; }
   h1 a { color: #60a5fa; text-decoration: none; }
   h2 { font-size: 1.2rem; color: #fff; margin-bottom: 1.5rem; font-weight: 600; }
   .meta { color: #666; font-size: 0.85rem; margin-bottom: 1.5rem; }
@@ -224,15 +225,22 @@ const BASE_STYLE = `
   .info-box { background: #0f0f1a; border: 1px solid #1a1a2e; border-radius: 8px; padding: 0.8rem 1.2rem; margin-bottom: 1rem; }
   .info-box p { color: #a0a0a0; line-height: 1.7; margin: 0.3rem 0; }
   .info-box code { background: #1a1a2e; color: #60a5fa; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.9rem; }
-  .info-box pre code { background: #1a1a2e; color: #a5b4fc; padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.85rem; display: block; }
-  pre { background: #0f0f1a; border: 1px solid #1a1a2e; border-radius: 8px; padding: 0.8rem 1rem; overflow-x: auto; margin: 0.5rem 0; line-height: 1.4; }
-  pre code { background: none; color: #e0e0e0; padding: 0; font-size: 0.85rem; line-height: 1.4; }
-  table { font-size: 0.85rem; }
-  th { text-align: left; color: #a0a0a0; padding: 0.4rem 0.6rem; border-bottom: 1px solid #1a1a2e; }
+  .info-box pre code { background: #1a1a2e; color: #a5b4fc; padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.85rem; display: block; white-space: pre-wrap; overflow-wrap: break-word; }
+  pre { background: #0f0f1a; border: 1px solid #1a1a2e; border-radius: 8px; padding: 0.8rem 1rem; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0.5rem 0; line-height: 1.4; max-width: 100%; }
+  pre code { background: none; color: #e0e0e0; padding: 0; font-size: 0.85rem; line-height: 1.4; white-space: pre-wrap; overflow-wrap: break-word; }
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; margin: 1rem 0; }
+  table { font-size: 0.85rem; border-collapse: collapse; width: 100%; }
+  th { text-align: left; color: #a0a0a0; padding: 0.4rem 0.6rem; border-bottom: 1px solid #1a1a2e; white-space: nowrap; }
   td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #0f0f1a; color: #ccc; }
   a { color: #60a5fa; text-decoration: none; }
   a:hover { text-decoration: underline; }
   footer { margin-top: 2rem; color: #333; font-size: 0.75rem; text-align: center; }
+  @media (max-width: 480px) {
+    body { padding: 1.2rem 1rem; }
+    h1 { font-size: 1.5rem; }
+    .info-box { padding: 0.6rem 0.8rem; }
+    .messages { padding: 0.7rem; }
+  }
 `;
 
 function pageShell(title: string, body: string): string {
@@ -429,7 +437,7 @@ function mdToInfoBoxHtml(md: string): string {
         const cells = row.split("|").filter(Boolean).map((c: string) => `<td>${c.trim()}</td>`).join("");
         return `<tr>${cells}</tr>`;
       }).join("");
-      return `<table style="width:100%;border-collapse:collapse;margin:1rem 0"><thead><tr>${th}</tr></thead><tbody>${rows}</tbody></table>`;
+      return `<div class="table-wrap"><table><thead><tr>${th}</tr></thead><tbody>${rows}</tbody></table></div>`;
     })
     .replace(/^- (.+)$/gm, "<p>&bull; $1</p>")
     .replace(/\n{2,}/g, "\n")
