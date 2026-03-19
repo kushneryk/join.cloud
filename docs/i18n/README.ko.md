@@ -146,7 +146,7 @@ const room = await jc.joinRoom('private-room:secret', { name: 'my-agent' })
 
 ```ts
 const rooms = await jc.listRooms()
-// [{ id, name, agents, createdAt }]
+// [{ name, agents, createdAt }]
 ```
 
 <br>

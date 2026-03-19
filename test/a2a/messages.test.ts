@@ -27,7 +27,7 @@ describe("A2A message.send", () => {
     const { name, roomId } = await createRoom();
     const { agentToken } = await joinRoom(name, "agent1");
     await sendMsg(agentToken, "Test message body");
-    const hist = await a2a("message.history", roomId, "", {});
+    const hist = await a2a("message.history", roomId, "", { agentToken });
     const data = resultData(hist);
     const found = data.messages.find((m: any) => m.body === "Test message body");
     expect(found).toBeTruthy();
@@ -58,7 +58,7 @@ describe("A2A message.history", () => {
     const { agentToken } = await joinRoom(name, "agent1");
     await sendMsg(agentToken, "msg1");
     await sendMsg(agentToken, "msg2");
-    const res = await a2a("message.history", roomId);
+    const res = await a2a("message.history", roomId, "", { agentToken });
     expect(isError(res)).toBe(false);
     const data = resultData(res);
     expect(data.messages).toBeInstanceOf(Array);
@@ -69,7 +69,7 @@ describe("A2A message.history", () => {
     const { name, roomId } = await createRoom();
     const { agentToken } = await joinRoom(name, "agent1");
     for (let i = 0; i < 5; i++) await sendMsg(agentToken, `msg${i}`);
-    const res = await a2a("message.history", roomId, "", { limit: 2 });
+    const res = await a2a("message.history", roomId, "", { agentToken, limit: 2 });
     const data = resultData(res);
     expect(data.messages.length).toBeLessThanOrEqual(2);
   });
@@ -78,8 +78,8 @@ describe("A2A message.history", () => {
     const { name, roomId } = await createRoom();
     const { agentToken } = await joinRoom(name, "agent1");
     for (let i = 0; i < 5; i++) await sendMsg(agentToken, `msg${i}`);
-    const all = resultData(await a2a("message.history", roomId, "", { limit: 100 }));
-    const offset = resultData(await a2a("message.history", roomId, "", { limit: 100, offset: 2 }));
+    const all = resultData(await a2a("message.history", roomId, "", { agentToken, limit: 100 }));
+    const offset = resultData(await a2a("message.history", roomId, "", { agentToken, limit: 100, offset: 2 }));
     expect(offset.messages.length).toBe(all.messages.length - 2);
   });
 
@@ -87,7 +87,7 @@ describe("A2A message.history", () => {
     const { name, roomId } = await createRoom();
     const { agentToken } = await joinRoom(name, "agent1");
     await sendMsg(agentToken, "test body");
-    const res = await a2a("message.history", roomId);
+    const res = await a2a("message.history", roomId, "", { agentToken });
     const data = resultData(res);
     const msg = data.messages.find((m: any) => m.body === "test body");
     expect(msg).toBeTruthy();
@@ -102,7 +102,7 @@ describe("A2A message.history", () => {
     const { agentToken: t1 } = await joinRoom(name, "agent1");
     await joinRoom(name, "agent2");
     await sendMsg(t1, "dm text", "agent2");
-    const res = await a2a("message.history", roomId, "", { limit: 100 });
+    const res = await a2a("message.history", roomId, "", { agentToken: t1, limit: 100 });
     const data = resultData(res);
     const dm = data.messages.find((m: any) => m.body === "dm text");
     expect(dm).toBeTruthy();
@@ -110,15 +110,19 @@ describe("A2A message.history", () => {
   });
 
   // --- Negative ---
-  it("rejects history without contextId", async () => {
-    const res = await a2a("message.history");
+  it("rejects history without agentToken", async () => {
+    const { roomId } = await createRoom();
+    const res = await a2a("message.history", roomId);
     expect(isError(res)).toBe(true);
-    expect(resultText(res)).toContain("required");
+    expect(resultText(res)).toContain("agentToken");
   });
 
-  it("rejects history for non-existent room", async () => {
-    const res = await a2a("message.history", "nonexistent-room-id");
+  it("rejects history for wrong room", async () => {
+    const { name } = await createRoom();
+    const { agentToken } = await joinRoom(name, "agent1");
+    const { roomId: otherRoomId } = await createRoom();
+    const res = await a2a("message.history", otherRoomId, "", { agentToken });
     expect(isError(res)).toBe(true);
-    expect(resultText(res)).toContain("not found");
+    expect(resultText(res)).toContain("does not belong");
   });
 });

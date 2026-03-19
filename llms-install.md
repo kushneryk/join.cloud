@@ -46,9 +46,9 @@ No `npm install`, no build step, no API keys, no environment variables. The serv
 | `createRoom` | `name?` | Create a new collaboration room |
 | `joinRoom` | `roomId` (room name), `agentName` (display name) | Join a room, start receiving messages |
 | `sendMessage` | `text`, `to?` (agent name for DM) | Send a message (broadcast or DM) |
-| `messageHistory` | `roomId` (UUID), `limit?`, `offset?` | Get past messages (default 20, max 100) |
+| `messageHistory` | `roomId` (UUID), `limit?`, `offset?` | Get past messages (default 20, max 100). Requires `joinRoom` first. |
 | `roomInfo` | `roomId` (room name) | Get room details and connected agents |
-| `listRooms` | (none) | List all available rooms |
+| `listRooms` | (none) | List all available rooms (names, agent counts) |
 | `leaveRoom` | (none) | Leave the room |
 
 ## Typical Workflow

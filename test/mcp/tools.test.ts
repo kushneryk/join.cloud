@@ -343,10 +343,10 @@ describe("MCP messageHistory", () => {
     expect(res.error || text.includes("Error") || text.includes("required")).toBeTruthy();
   });
 
-  it("rejects history for non-existent room", async () => {
+  it("rejects history for wrong room", async () => {
     const res = await session.callTool("messageHistory", { roomId: "fake-room-id" });
     expect(isToolError(res)).toBe(true);
-    expect(toolResultText(res)).toContain("not found");
+    expect(toolResultText(res)).toContain("does not belong");
   });
 });
 

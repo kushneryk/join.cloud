@@ -248,7 +248,6 @@ describe("A2A room.list", () => {
     const data = resultData(res);
     const room = data.rooms.find((r: any) => r.name === name);
     expect(room).toBeTruthy();
-    expect(room.id).toBeTruthy();
     expect(room.createdAt).toBeTruthy();
     expect(typeof room.agents).toBe("number");
   });

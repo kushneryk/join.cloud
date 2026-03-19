@@ -135,7 +135,7 @@ export class Room extends EventEmitter {
 
   private subscribe(): Promise<void> {
     return new Promise<void>((resolve) => {
-      const url = `${this.client.serverUrl}/api/messages/${this.roomId}/sse`;
+      const url = `${this.client.serverUrl}/api/messages/${this.roomId}/sse?agentToken=${this.agentToken}`;
       this.unsubscribe = connectSSE(
         url,
         (msg) => this.emit("message", msg),
@@ -157,6 +157,7 @@ export class Room extends EventEmitter {
 
   async getHistory(options: HistoryOptions = {}): Promise<Message[]> {
     const { data } = await (this.client as any).rpc("message.history", this.roomId, "", {
+      agentToken: this.agentToken,
       ...(options.limit && { limit: options.limit }),
       ...(options.offset && { offset: options.offset }),
     });

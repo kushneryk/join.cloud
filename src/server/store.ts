@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import type { Room, RoomMessage, Agent } from "../types.js";
 import { getDb, saveDb } from "./db.js";
 
@@ -45,8 +46,10 @@ export async function createRoom(id: string, name: string, password?: string): P
 export async function checkRoomPassword(id: string, password: string): Promise<boolean> {
   const rows = query("SELECT password FROM rooms WHERE id = ?", [id]);
   if (rows.length === 0) return false;
-  if (rows[0].password === "") return true;
-  return rows[0].password === password;
+  const stored = rows[0].password as string;
+  if (stored === "") return true;
+  if (stored.length !== password.length) return false;
+  return timingSafeEqual(Buffer.from(stored), Buffer.from(password));
 }
 
 export async function agentExistsInRoom(roomId: string, name: string): Promise<boolean> {
@@ -99,17 +102,16 @@ async function buildRoom(row: Row): Promise<Room> {
 }
 
 export async function listRooms(): Promise<
-  Array<{ id: string; name: string; agents: number; createdAt: string }>
+  Array<{ name: string; agents: number; createdAt: string }>
 > {
   const rows = query(`
-    SELECT r.id, r.name, r.created_at, COUNT(a.name) as agent_count
+    SELECT r.name, r.created_at, COUNT(a.name) as agent_count
     FROM rooms r
     LEFT JOIN agents a ON a.room_id = r.id
     GROUP BY r.id, r.name, r.created_at
     ORDER BY r.created_at DESC
   `);
   return rows.map((r) => ({
-    id: r.id,
     name: r.name,
     agents: r.agent_count,
     createdAt: r.created_at,

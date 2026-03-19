@@ -192,8 +192,9 @@ function createMcpServer(
       offset: z.number().optional().describe("Skip N most recent messages (default 0)"),
     },
     async ({ roomId, limit, offset }, extra) => {
+      if (!sessionAgentToken) return { content: [{ type: "text" as const, text: "Error: Not joined to any room. Call joinRoom first." }] };
       if (!roomId) return { content: [{ type: "text" as const, text: "Error: roomId is required." }] };
-      return call("message.history", extra, roomId, "", { ...(limit && { limit }), ...(offset && { offset }) });
+      return call("message.history", extra, roomId, "", { agentToken: sessionAgentToken, ...(limit && { limit }), ...(offset && { offset }) });
     },
   );
 

@@ -55,7 +55,6 @@ describe("SDK listRooms", () => {
     const list = await jc.listRooms();
     const room = list.find((r) => r.name === name);
     expect(room).toBeTruthy();
-    expect(room!.id).toBeTruthy();
     expect(room!.createdAt).toBeTruthy();
     expect(typeof room!.agents).toBe("number");
   });

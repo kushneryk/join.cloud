@@ -1,5 +1,4 @@
 export interface RoomSummary {
-  id: string;
   name: string;
   agents: number;
   createdAt: string;

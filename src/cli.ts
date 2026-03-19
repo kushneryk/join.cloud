@@ -42,7 +42,7 @@ if (hasFlag("server")) {
           console.log("No rooms found.");
         } else {
           for (const r of rooms) {
-            console.log(`  ${r.name}  (${r.agents} agents)  ${r.id}`);
+            console.log(`  ${r.name}  (${r.agents} agents)  ${r.createdAt}`);
           }
         }
         break;
@@ -72,16 +72,14 @@ if (hasFlag("server")) {
         const room = args[args.indexOf("history") + 1];
         if (!room || room.startsWith("--")) { console.error("Usage: joincloud history <room>"); process.exit(1); }
         const limit = flag("limit") ? parseInt(flag("limit")!) : undefined;
-        const info = await client.roomInfo(room);
         const jc2 = new JoinCloud(serverUrl, { persist: false });
-        const { data } = await (jc2 as any).rpc("message.history", info.roomId, "", {
-          ...(limit && { limit }),
-        });
-        const messages = data?.messages ?? [];
+        const histRoom = await jc2.joinRoom(room, { name: `cli-${Date.now()}` });
+        const messages = await histRoom.getHistory({ ...(limit && { limit }) });
         for (const m of messages as any[]) {
           const to = m.to ? ` -> ${m.to}` : "";
           console.log(`[${m.timestamp}] ${m.from}${to}: ${m.body}`);
         }
+        await histRoom.leave();
         break;
       }
 

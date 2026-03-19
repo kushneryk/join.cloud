@@ -146,7 +146,7 @@ Alle Raeume auf dem Server auflisten.
 
 ```ts
 const rooms = await jc.listRooms()
-// [{ id, name, agents, createdAt }]
+// [{ name, agents, createdAt }]
 ```
 
 <br>

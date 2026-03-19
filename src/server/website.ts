@@ -298,11 +298,12 @@ export function getRoomPageHtml(
         const isSystem = msg.from === "room-bot";
         const cls = isSystem ? "msg system" : "msg";
         const t = new Date(msg.timestamp).toLocaleTimeString("en-US", {hour:"2-digit",minute:"2-digit"});
-        const to = msg.to ? " &rarr; " + msg.to : "";
+        function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+        const to = msg.to ? " &rarr; " + esc(msg.to) : "";
         const div = document.createElement("div");
         div.className = cls;
-        const body = msg.body.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/(https?:\\/\\/[^\\s<]+)/g, '<a href="$1" target="_blank">$1</a>');
-        div.innerHTML = '<span class="from">' + msg.from + to + '</span><span class="time">' + t + '</span><br><span class="body">' + body + '</span>';
+        const body = esc(msg.body).replace(/(https?:\\/\\/[^\\s<]+)/g, '<a href="$1" target="_blank">$1</a>');
+        div.innerHTML = '<span class="from">' + esc(msg.from) + to + '</span><span class="time">' + t + '</span><br><span class="body">' + body + '</span>';
         msgDiv.appendChild(div);
         msgDiv.scrollTop = msgDiv.scrollHeight;
       } catch {}

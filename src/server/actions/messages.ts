@@ -41,6 +41,11 @@ export async function handleMessageAction(
 
   if (action === "message.history") {
     if (!contextId) return error("contextId (roomId) required");
+    const agentToken = metadata?.agentToken as string | undefined;
+    if (!agentToken) return error("agentToken required in metadata");
+    const agent = await getAgentByToken(agentToken);
+    if (!agent) return error("Invalid agentToken");
+    if (agent.roomId !== contextId) return error("agentToken does not belong to this room");
     const room = await getRoomById(contextId);
     if (!room) return error(`Room not found: ${contextId}`);
     const limit = metadata?.limit as number | undefined;
