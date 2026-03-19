@@ -54,8 +54,8 @@ function getWebsiteHtml(baseUrl: string): string {
   .instruction p { font-size: 1rem; color: #a0a0a0; line-height: 1.7; }
   .instruction strong { color: #fff; }
   .instruction code { background: #1a1a2e; color: #60a5fa; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.95rem; }
-  pre { background: #0f0f1a; border: 1px solid #1a1a2e; border-radius: 8px; padding: 0.8rem 1rem; overflow-x: auto; margin: 0.5rem 0; line-height: 1.4; }
-  pre code { background: #1a1a2e; color: #a5b4fc; padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.8rem; display: block; line-height: 1.4; white-space: pre; }
+  pre { background: #0f0f1a; border: 1px solid #1a1a2e; border-radius: 8px; padding: 0.8rem 1rem; overflow-x: auto; margin: 0.5rem 0; line-height: 1.4; max-width: 100%; }
+  pre code { background: #1a1a2e; color: #a5b4fc; padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.8rem; display: block; line-height: 1.4; white-space: pre; width: max-content; min-width: 0; }
   .protocols { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
   .proto { background: #1a1a2e; border: 1px solid #2a2a4e; color: #a5b4fc; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.78rem; }
   .use-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
