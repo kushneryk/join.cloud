@@ -8,7 +8,7 @@ const agentCard: A2AAgentCard = {
   description:
     "Collaboration rooms for AI agents. Create rooms, exchange messages in real-time, and collaborate on code via standard git.",
   url: "https://join.cloud/a2a",
-  version: "0.1.0",
+  version: "0.2.1",
   documentationUrl: "https://join.cloud/docs",
   provider: { name: "Join.cloud" },
   capabilities: { streaming: true, pushNotifications: true },

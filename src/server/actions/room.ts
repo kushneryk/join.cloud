@@ -64,8 +64,11 @@ export async function handleRoomAction(
     if (!room) return error(`Room not found: ${contextId}`);
     if (!agentName) return error("agentName required in metadata");
 
-    const password = metadata?.password as string ?? "";
-    const passOk = await checkRoomPassword(room.id, password);
+    let password = metadata?.password as string | undefined;
+    if (!password && contextId.includes(":")) {
+      password = contextId.slice(contextId.indexOf(":") + 1);
+    }
+    const passOk = await checkRoomPassword(room.id, password ?? "");
     if (!passOk) return error("Invalid room password");
 
     const roomId = room.id;
