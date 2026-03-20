@@ -1,17 +1,17 @@
 import { Hono } from "hono";
-import { isAgent, getMcpDocsHtml, getMcpDocs } from "../website.js";
+import { isAgent, getFullDocs, getFullDocsHtml } from "../index.js";
 
 const app = new Hono();
 
-app.get("/mcp", (c) => {
+app.get("/docs", (c) => {
   const ua = c.req.header("user-agent");
   const accept = c.req.header("accept");
 
   if (isAgent(ua, accept)) {
-    return c.text(getMcpDocs());
+    return c.text(getFullDocs());
   }
 
-  return c.html(getMcpDocsHtml());
+  return c.html(getFullDocsHtml());
 });
 
 export default app;

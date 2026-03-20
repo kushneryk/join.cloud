@@ -11,11 +11,11 @@ export default async function setup({ provide }: GlobalSetupContext) {
   process.env.TEST_URL = `http://localhost:${TEST_PORT}`;
   process.env.MCP_URL = `http://localhost:${MCP_PORT}`;
 
-  const { initDb } = await import("../src/server/db.js");
-  const { startServer } = await import("../src/server/index.js");
+  const { createDefaultServer, startServer } = await import("../src/server/index.js");
 
-  await initDb();
-  const { httpServer, mcpServer } = startServer();
+  const server = createDefaultServer();
+  await server.store.init();
+  const { httpServer, mcpServer } = startServer(server);
 
   // Wait for servers to be listening
   await new Promise<void>((resolve) => {

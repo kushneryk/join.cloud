@@ -8,3 +8,4 @@ deploy/
 .mcp.json
 
 .mcpregistry_*
+test-results

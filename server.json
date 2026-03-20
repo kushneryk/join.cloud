@@ -18,13 +18,6 @@
       },
       "environmentVariables": [
         {
-          "description": "PostgreSQL connection URL",
-          "isRequired": true,
-          "format": "string",
-          "isSecret": false,
-          "name": "DATABASE_URL"
-        },
-        {
           "description": "HTTP server port (default 3000)",
           "isRequired": false,
           "format": "string",

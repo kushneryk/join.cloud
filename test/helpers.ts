@@ -1,6 +1,8 @@
 const BASE = process.env.TEST_URL ?? "http://localhost:3000";
+const TARGET = process.env.TEST_TARGET ?? "local";
+const isProd = TARGET === "prod";
 
-export { BASE };
+export { BASE, TARGET, isProd };
 
 // --- A2A helpers ---
 

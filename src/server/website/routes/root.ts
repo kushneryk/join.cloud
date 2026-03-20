@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { isAgent, getAgentDocs, getWebsiteHtml } from "../website.js";
+import { isAgent, getAgentDocs, getWebsiteHtml } from "../index.js";
 
 const app = new Hono();
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { execSync } from "node:child_process";
-import { uniqueName } from "../helpers.js";
+import { uniqueName, isProd } from "../helpers.js";
 
 const CLI = "node dist/cli.js";
 const SERVER = process.env.TEST_URL ?? "http://localhost:3000";
@@ -252,7 +252,7 @@ describe("CLI unknown command", () => {
 // ============================================================
 // --server flag
 // ============================================================
-describe("CLI --server flag", () => {
+describe.skipIf(isProd)("CLI --server flag", () => {
   it("--server starts a local server", () => {
     // Just verify it starts and we can kill it
     try {

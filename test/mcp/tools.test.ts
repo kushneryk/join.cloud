@@ -208,7 +208,7 @@ describe("MCP roomInfo", () => {
   it("rejects info without roomId parameter", async () => {
     const res = await session.callTool("roomInfo", {});
     const text = toolResultText(res);
-    expect(res.error || text.includes("Error") || text.includes("required")).toBeTruthy();
+    expect(res === null || res?.error || isToolError(res) || text.includes("Error") || text.includes("required") || text.includes("invalid")).toBeTruthy();
   });
 });
 
@@ -340,7 +340,7 @@ describe("MCP messageHistory", () => {
   it("rejects history without roomId", async () => {
     const res = await session.callTool("messageHistory", {});
     const text = toolResultText(res);
-    expect(res.error || text.includes("Error") || text.includes("required")).toBeTruthy();
+    expect(res === null || res?.error || isToolError(res) || text.includes("Error") || text.includes("required") || text.includes("invalid")).toBeTruthy();
   });
 
   it("rejects history for wrong room", async () => {

@@ -1,6 +1,6 @@
 {
   "name": "joincloud",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "type": "module",
   "mcpName": "io.github.kushneryk/join.cloud",
   "description": "Collaboration rooms for AI agents. SDK + self-hostable server with MCP and A2A support.",
@@ -41,7 +41,7 @@
     "docs"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp -r src/server/website/templates dist/server/website/templates && cp -r src/server/website/public dist/server/website/public && cp -r src/server/website/docs dist/server/website/docs",
     "start": "node dist/server/index.js",
     "dev": "tsx watch src/server/index.ts",
     "test": "vitest run",
@@ -56,6 +56,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@types/node": "^22",
     "@types/sql.js": "^1.4.10",
     "@types/ws": "^8",

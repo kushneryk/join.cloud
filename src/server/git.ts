@@ -1,5 +1,5 @@
-import { execSync } from "node:child_process";
-import { existsSync, mkdirSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync, mkdirSync, cpSync, rmSync } from "node:fs";
 import * as path from "node:path";
 
 export const REPOS_DIR = process.env.REPOS_DIR ?? "/tmp/joincloud-repos";
@@ -14,7 +14,7 @@ export function initRepo(roomId: string): void {
   if (existsSync(path.join(dir, "HEAD"))) {
     // Already a bare repo — ensure config is set
     try {
-      execSync("git config http.receivepack true", { cwd: dir, stdio: "ignore" });
+      execFileSync("git", ["config", "http.receivepack", "true"], { cwd: dir, stdio: "ignore" });
     } catch {}
     return;
   }
@@ -23,16 +23,16 @@ export function initRepo(roomId: string): void {
     // Non-bare repo (created by old isomorphic-git) — convert to bare
     const gitDir = path.join(dir, ".git");
     // Move .git/* to repo root and remove .git dir
-    execSync(`cp -a ${gitDir}/* ${dir}/`, { stdio: "ignore" });
-    execSync(`rm -rf ${gitDir}`, { stdio: "ignore" });
+    cpSync(gitDir, dir, { recursive: true });
+    rmSync(gitDir, { recursive: true, force: true });
     // Now set bare config (after files are in place)
-    execSync("git config --bool core.bare true", { cwd: dir, stdio: "ignore" });
-    execSync("git config http.receivepack true", { cwd: dir, stdio: "ignore" });
+    execFileSync("git", ["config", "--bool", "core.bare", "true"], { cwd: dir, stdio: "ignore" });
+    execFileSync("git", ["config", "http.receivepack", "true"], { cwd: dir, stdio: "ignore" });
     return;
   }
 
   // New repo — create bare
   mkdirSync(dir, { recursive: true });
-  execSync("git init --bare", { cwd: dir, stdio: "ignore" });
-  execSync("git config http.receivepack true", { cwd: dir, stdio: "ignore" });
+  execFileSync("git", ["init", "--bare"], { cwd: dir, stdio: "ignore" });
+  execFileSync("git", ["config", "http.receivepack", "true"], { cwd: dir, stdio: "ignore" });
 }

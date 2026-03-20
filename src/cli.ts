@@ -21,10 +21,10 @@ if (hasFlag("server")) {
   process.env.MCP_PORT = flag("mcp-port") ?? "3003";
   if (flag("data")) process.env.JOINCLOUD_DATA_DIR = flag("data");
 
-  const { initDb } = await import("./server/db.js");
-  const { startServer } = await import("./server/index.js");
-  await initDb();
-  startServer();
+  const { createDefaultServer, startServer } = await import("./server/index.js");
+  const server = createDefaultServer();
+  await server.store.init();
+  startServer(server);
   // server keeps running
 } else {
   // Client mode

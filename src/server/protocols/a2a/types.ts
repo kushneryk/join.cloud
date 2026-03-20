@@ -89,7 +89,6 @@ export interface JsonRpcError {
 
 export type JsonRpcResponse<R = unknown> = JsonRpcSuccess<R> | JsonRpcError;
 
-// SendMessage params
 export interface SendMessageParams {
   message: A2AMessage;
   configuration?: {
@@ -99,7 +98,15 @@ export interface SendMessageParams {
   metadata?: Record<string, unknown>;
 }
 
-// GetTask params
 export interface GetTaskParams {
   taskId: string;
+}
+
+// A2A adapter for method registry
+export interface A2aAdapter {
+  mapParams?: (msg: {
+    text: string;
+    contextId?: string;
+    metadata?: Record<string, unknown>;
+  }) => Record<string, unknown>;
 }

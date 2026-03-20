@@ -1,6 +1,11 @@
-import type { A2AMessage, SendMessageParams } from "./a2a.js";
-import { getRoom, addMessage, updateAgentLastSeen } from "./store.js";
-import type { RoomMessage } from "../types.js";
+import type { Store } from "./storage/interface.js";
+import type { RoomMessage } from "./types.js";
+
+let _store: Store;
+
+export function setBotStore(store: Store): void {
+  _store = store;
+}
 
 // SSE connections: roomId -> set of writers
 type SSEWriter = (data: string) => void;
@@ -12,7 +17,7 @@ export function addSseClient(roomId: string, writer: SSEWriter): () => void {
   return () => sseClients.get(roomId)?.delete(writer);
 }
 
-// Generic room listeners (for MCP push, etc.)
+// Generic room listeners (for protocol push: MCP, A2A, etc.)
 type RoomListener = (msg: RoomMessage) => void;
 const roomListeners = new Map<string, Set<RoomListener>>();
 
@@ -20,6 +25,15 @@ export function addRoomListener(roomId: string, listener: RoomListener): () => v
   if (!roomListeners.has(roomId)) roomListeners.set(roomId, new Set());
   roomListeners.get(roomId)!.add(listener);
   return () => roomListeners.get(roomId)?.delete(listener);
+}
+
+// Global broadcast listeners (called on every broadcast with store access)
+type BroadcastListener = (roomId: string, msg: RoomMessage, store: Store) => void;
+const broadcastListeners = new Set<BroadcastListener>();
+
+export function addBroadcastListener(listener: BroadcastListener): () => void {
+  broadcastListeners.add(listener);
+  return () => broadcastListeners.delete(listener);
 }
 
 export function cleanupRoomConnections(roomId: string): void {
@@ -36,7 +50,7 @@ export async function botNotify(roomId: string, body: string): Promise<void> {
     timestamp: new Date().toISOString(),
   };
 
-  await addMessage(msg);
+  await _store.addMessage(msg);
   await broadcastToRoom(roomId, msg);
 }
 
@@ -44,21 +58,6 @@ export async function broadcastToRoom(
   roomId: string,
   msg: RoomMessage,
 ): Promise<void> {
-  const room = await getRoom(roomId);
-  if (!room) return;
-
-  const a2aMessage: A2AMessage = {
-    role: "agent",
-    parts: [{ text: msg.body }],
-    contextId: roomId,
-    metadata: {
-      joincloud: true,
-      from: msg.from,
-      to: msg.to,
-      messageId: msg.id,
-    },
-  };
-
   // Push to SSE clients (raw JSON — writeSSE adds the SSE framing)
   const sseData = JSON.stringify(msg);
   for (const writer of sseClients.get(roomId) ?? []) {
@@ -69,7 +68,7 @@ export async function broadcastToRoom(
     }
   }
 
-  // Push to generic room listeners (MCP, etc.)
+  // Push to per-room listeners (MCP sessions, etc.)
   for (const listener of roomListeners.get(roomId) ?? []) {
     try {
       listener(msg);
@@ -78,30 +77,12 @@ export async function broadcastToRoom(
     }
   }
 
-  // Push to agents with A2A endpoints (skip sender, skip room-bot)
-  for (const [name, agent] of room.agents) {
-    if (name === msg.from) continue;
-    if (msg.to && msg.to !== name) continue;
-    if (!agent.endpoint) continue;
-
-    const rpcBody = {
-      jsonrpc: "2.0" as const,
-      method: "SendMessage",
-      params: { message: a2aMessage } as SendMessageParams,
-      id: Date.now(),
-    };
-
-    fetch(agent.endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(rpcBody),
-    })
-      .then(() => {
-        // Mark this message as delivered to this agent
-        updateAgentLastSeen(roomId, name, msg.id).catch(() => {});
-      })
-      .catch(() => {
-        // Agent unreachable — last_seen not updated, will catch up later
-      });
+  // Push to global broadcast listeners (A2A endpoint delivery, etc.)
+  for (const listener of broadcastListeners) {
+    try {
+      listener(roomId, msg, _store);
+    } catch {
+      // Listener failed
+    }
   }
 }
