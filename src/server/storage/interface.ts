@@ -15,7 +15,7 @@ export interface Store {
   checkRoomPassword(id: string, password: string): Promise<boolean>;
 
   // Agents
-  addAgent(roomId: string, name: string, endpoint?: string, isHuman?: boolean): Promise<string>;
+  addAgent(roomId: string, name: string, endpoint?: string): Promise<string>;
   agentExistsInRoom(roomId: string, name: string): Promise<boolean>;
   getAgentToken(roomId: string, name: string): Promise<string | null>;
   getAgentByToken(token: string): Promise<{ roomId: string; name: string; endpoint?: string } | undefined>;
