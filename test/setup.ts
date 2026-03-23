@@ -5,6 +5,9 @@ const MCP_PORT = 3112;
 const DATA_DIR = "/tmp/joincloud-vitest-" + process.pid;
 
 export default async function setup({ provide }: GlobalSetupContext) {
+  // If TEST_URL is set externally, skip local server startup (prod testing)
+  if (process.env.TEST_URL) return async () => {};
+
   process.env.PORT = String(TEST_PORT);
   process.env.MCP_PORT = String(MCP_PORT);
   process.env.JOINCLOUD_DATA_DIR = DATA_DIR;
