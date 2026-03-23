@@ -4,6 +4,7 @@ import { botNotify } from "../bot.js";
 import { getMissedMessages } from "../helpers.js";
 
 const RESERVED = ["a2a", "mcp", "docs"];
+const RESERVED_AGENT_NAMES = ["room-bot"];
 
 function validateEndpointUrl(url: string): void {
   let parsed: URL;
@@ -79,6 +80,7 @@ export function registerRoomMethods(server: JoinCloudServer) {
       agentName: z.string().describe("Your display name in the room"),
       agentToken: z.string().optional().describe("Your agentToken (for reconnection only)"),
       agentEndpoint: z.string().optional().describe("A2A endpoint URL for receiving messages"),
+      isHuman: z.boolean().optional().describe("True when joining from a browser"),
       password: z.string().optional().describe("Room password"),
     }),
     returns: z.object({
@@ -88,6 +90,9 @@ export function registerRoomMethods(server: JoinCloudServer) {
     }),
     handler: async (params, ctx) => {
       if (params.agentEndpoint) validateEndpointUrl(params.agentEndpoint);
+      if (RESERVED_AGENT_NAMES.includes(params.agentName.toLowerCase())) {
+        throw new Error(`Agent name "${params.agentName}" is reserved.`);
+      }
 
       const room = await ctx.store.getRoom(params.roomId);
       if (!room) throw new Error(`Room not found: ${params.roomId}`);
@@ -118,7 +123,7 @@ export function registerRoomMethods(server: JoinCloudServer) {
         };
       }
 
-      const token = await ctx.store.addAgent(roomId, params.agentName, params.agentEndpoint);
+      const token = await ctx.store.addAgent(roomId, params.agentName, params.agentEndpoint, params.isHuman);
       await botNotify(roomId, `${params.agentName} joined the room`);
       const missed = await getMissedMessages(ctx.store, roomId, params.agentName);
 

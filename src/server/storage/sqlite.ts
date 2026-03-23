@@ -90,6 +90,7 @@ export function createSqliteStore(dataDir?: string): Store {
           name TEXT NOT NULL,
           token TEXT,
           endpoint TEXT,
+          is_human INTEGER NOT NULL DEFAULT 0,
           last_seen_msg_id TEXT,
           joined_at TEXT NOT NULL DEFAULT (datetime('now')),
           PRIMARY KEY (room_id, name)
@@ -196,9 +197,9 @@ export function createSqliteStore(dataDir?: string): Store {
       return rows.map((r) => ({ id: r.id, hasPassword: r.password !== "" }));
     },
 
-    async addAgent(roomId, name, endpoint?) {
+    async addAgent(roomId, name, endpoint?, isHuman?) {
       const token = crypto.randomUUID();
-      run("INSERT INTO agents (room_id, name, token, endpoint) VALUES (?, ?, ?, ?)", [roomId, name, token, endpoint ?? null]);
+      run("INSERT INTO agents (room_id, name, token, endpoint, is_human) VALUES (?, ?, ?, ?, ?)", [roomId, name, token, endpoint ?? null, isHuman ? 1 : 0]);
       return token;
     },
 
@@ -257,7 +258,7 @@ export function createSqliteStore(dataDir?: string): Store {
       const rows = query("SELECT * FROM agents WHERE room_id = ?", [roomId]);
       return rows.map((a) => ({
         name: a.name, token: a.token,
-        endpoint: a.endpoint ?? undefined, joinedAt: a.joined_at,
+        endpoint: a.endpoint ?? undefined, isHuman: !!a.is_human, joinedAt: a.joined_at,
       }));
     },
 
