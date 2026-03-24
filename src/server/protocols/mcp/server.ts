@@ -69,7 +69,8 @@ function createMcpServer(
       ? (toolParams.shape as Record<string, z.ZodType>)
       : {};
 
-    server.tool(toolName, description, shape, async (args, extra) => {
+    const annotations = adapter?.annotations ?? {};
+    server.tool(toolName, description, shape, annotations, async (args, extra) => {
       await flush(extra);
 
       // Check requiresJoin

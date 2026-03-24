@@ -4,10 +4,18 @@ import type { McpAdapter } from "./types.js";
 export function registerMcpAdapters(server: { mcp: (name: string, adapter: McpAdapter) => void }) {
   server.mcp("room.create", {
     toolName: "createRoom",
+    description: "Create a new collaboration room. Returns the room ID for joining.",
     params: z.object({
       name: z.string().optional().describe("Room name"),
       password: z.string().optional().describe("Optional password to protect the room"),
     }),
+    annotations: {
+      title: "Create Room",
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: false,
+    },
   });
 
   server.mcp("room.join", {
@@ -19,6 +27,13 @@ export function registerMcpAdapters(server: { mcp: (name: string, adapter: McpAd
       password: z.string().optional().describe("Room password (alternative to name:password syntax)"),
       agentToken: z.string().optional().describe("Your agentToken (for reconnection only)"),
     }),
+    annotations: {
+      title: "Join Room",
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
     afterMcp: async (result, session) => {
       if (result.data?.agentToken) {
         session.agentToken = result.data.agentToken as string;
@@ -28,21 +43,45 @@ export function registerMcpAdapters(server: { mcp: (name: string, adapter: McpAd
 
   server.mcp("room.leave", {
     toolName: "leaveRoom",
+    description: "Leave the current room and release your agent name.",
     params: z.object({}),
+    annotations: {
+      title: "Leave Room",
+      readOnlyHint: false,
+      destructiveHint: true,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
     inject: (session) => ({ agentToken: session.agentToken as string }),
     requiresJoin: true,
   });
 
   server.mcp("room.info", {
     toolName: "roomInfo",
+    description: "Get room details including name, participants, and settings.",
     params: z.object({
       roomId: z.string().optional().describe("Room name"),
     }),
+    annotations: {
+      title: "Room Info",
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
   });
 
   server.mcp("room.list", {
     toolName: "listRooms",
+    description: "List all public rooms on the server.",
     params: z.object({}),
+    annotations: {
+      title: "List Rooms",
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
   });
 
   server.mcp("message.send", {
@@ -52,18 +91,32 @@ export function registerMcpAdapters(server: { mcp: (name: string, adapter: McpAd
       text: z.string().describe("Message text"),
       to: z.string().optional().describe("DM target agent name (omit for broadcast)"),
     }),
+    annotations: {
+      title: "Send Message",
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: false,
+    },
     inject: (session) => ({ agentToken: session.agentToken as string }),
     requiresJoin: true,
   });
 
   server.mcp("message.history", {
     toolName: "messageHistory",
-    description: "Get message history from the room (default last 20, max 100)",
+    description: "Get message history from the room (default last 20, max 100).",
     params: z.object({
       roomId: z.string().optional().describe("Room ID (UUID from joinRoom)"),
       limit: z.number().optional().describe("Number of messages (default 20, max 100)"),
       offset: z.number().optional().describe("Skip N most recent messages (default 0)"),
     }),
+    annotations: {
+      title: "Message History",
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
     inject: (session) => ({ agentToken: session.agentToken as string }),
     requiresJoin: true,
   });
