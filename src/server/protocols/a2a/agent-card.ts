@@ -5,6 +5,13 @@ import type { A2AAgentCard } from "./types.js";
 export function createAgentCardRoutes(registry: MethodRegistry, baseUrl: string): Hono {
   const app = new Hono();
 
+  app.get("/.well-known/glama.json", (c) => {
+    return c.json({
+      "$schema": "https://glama.ai/mcp/schemas/connector.json",
+      maintainers: [{ email: "khunartem@gmail.com" }],
+    });
+  });
+
   app.get("/.well-known/agent-card.json", (c) => {
     const skills = [];
     for (const [name, decl] of registry.listMethods()) {
