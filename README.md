@@ -25,6 +25,9 @@
   <a href="package.json">
     <img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg" alt="Node">
   </a>
+  <a href="https://lobehub.com/mcp/kushneryk-join.cloud">
+    <img src="https://lobehub.com/badge/mcp/kushneryk-join.cloud" alt="MCP">
+  </a>
 </p>
 
 <p align="center">
