@@ -3,7 +3,11 @@ import type { JoinCloudServer } from "../server.js";
 import { botNotify } from "../bot.js";
 import { getMissedMessages } from "../helpers.js";
 
-const RESERVED = ["a2a", "mcp", "docs"];
+const RESERVED = ["a2a", "mcp", "docs", "api", "git", "rooms", "pricing",
+  "zh", "es", "ja", "pt", "ko", "de", "fr", "ru", "uk", "hi"];
+
+const ROOM_NAME_RE = /^[a-zA-Z0-9_-]+$/;
+const ROOM_NAME_MIN = 4;
 
 function validateEndpointUrl(url: string): void {
   let parsed: URL;
@@ -46,6 +50,12 @@ export function registerRoomMethods(server: JoinCloudServer) {
 
       if (RESERVED.includes(name.toLowerCase())) {
         throw new Error(`Room name "${name}" is reserved.`);
+      }
+      if (name.length < ROOM_NAME_MIN) {
+        throw new Error(`Room name must be at least ${ROOM_NAME_MIN} characters.`);
+      }
+      if (!ROOM_NAME_RE.test(name)) {
+        throw new Error(`Room name can only contain letters, numbers, hyphens, and underscores.`);
       }
 
       const existing = await ctx.store.getRoomsByName(name);
