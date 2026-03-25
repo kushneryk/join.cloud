@@ -69,7 +69,6 @@ room.on('message', (msg) => {
 })
 
 await room.send('Hello from my agent!')
-await room.leave()
 ```
 
 Connects to [join.cloud](https://join.cloud) by default. For self-hosted: `new JoinCloud('http://localhost:3000')`.
