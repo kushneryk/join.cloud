@@ -95,6 +95,7 @@ export class JoinCloud {
     if (options.password) metadata.password = options.password;
     if (savedToken) metadata.agentToken = savedToken;
 
+    const joinedAt = new Date().toISOString();
     const { data } = await this.rpc("room.join", roomName, "", metadata);
 
     const agentToken = data?.agentToken as string;
@@ -104,7 +105,7 @@ export class JoinCloud {
       saveToken(this.serverUrl, roomName, options.name, agentToken);
     }
 
-    const room = new Room(this, roomName, roomId, options.name, agentToken);
+    const room = new Room(this, roomName, roomId, options.name, agentToken, joinedAt);
     await room.connected();
     return room;
   }
@@ -118,15 +119,46 @@ export class Room extends EventEmitter {
   private client: JoinCloud;
   private unsubscribe?: () => void;
   private connectPromise: Promise<void>;
+  private seenIds = new Set<string>();
+  private messageBuffer: Message[] = [];
+  private hasMessageListener = false;
+  private joinedAt: string;
 
-  constructor(client: JoinCloud, roomName: string, roomId: string, agentName: string, agentToken: string) {
+  constructor(client: JoinCloud, roomName: string, roomId: string, agentName: string, agentToken: string, joinedAt: string) {
     super();
     this.client = client;
     this.roomName = roomName;
     this.roomId = roomId;
     this.agentName = agentName;
     this.agentToken = agentToken;
+    this.joinedAt = joinedAt;
     this.connectPromise = this.subscribe();
+  }
+
+  on(event: string | symbol, listener: (...args: any[]) => void): this {
+    super.on(event, listener);
+    if (event === "message" && !this.hasMessageListener) {
+      this.hasMessageListener = true;
+      // Flush buffered SSE messages
+      const buffered = this.messageBuffer;
+      this.messageBuffer = [];
+      for (const msg of buffered) this.emit("message", msg);
+      // Fetch history to catch messages missed before SSE connected
+      this.replayMissed();
+    }
+    return this;
+  }
+
+  private async replayMissed(): Promise<void> {
+    try {
+      const history = await this.getHistory({ limit: 50 });
+      for (const msg of history) {
+        if (msg.timestamp >= this.joinedAt && !this.seenIds.has(msg.id)) {
+          this.seenIds.add(msg.id);
+          this.emit("message", msg);
+        }
+      }
+    } catch {}
   }
 
   connected(): Promise<void> {
@@ -138,7 +170,14 @@ export class Room extends EventEmitter {
       const url = `${this.client.serverUrl}/api/messages/${this.roomId}/sse?agentToken=${this.agentToken}`;
       this.unsubscribe = connectSSE(
         url,
-        (msg) => this.emit("message", msg),
+        (msg) => {
+          if (msg.id) this.seenIds.add(msg.id);
+          if (this.hasMessageListener) {
+            this.emit("message", msg);
+          } else {
+            this.messageBuffer.push(msg);
+          }
+        },
         (err) => this.emit("error", err),
         () => {
           this.emit("connect");
