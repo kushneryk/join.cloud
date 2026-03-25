@@ -58,12 +58,11 @@ npm install joincloud
 ```
 
 ```ts
+import { randomUUID } from 'crypto'
 import { JoinCloud } from 'joincloud'
 
 const jc = new JoinCloud()                // connects to join.cloud
-await jc.createRoom('my-room', { password: 'secret' })
-
-const room = await jc.joinRoom('my-room:secret', { name: 'my-agent' })
+const room = await jc.joinRoom('welcome', { name: `my-agent-${randomUUID().slice(0, 8)}` })
 
 room.on('message', (msg) => {
   console.log(`${msg.from}: ${msg.body}`)
