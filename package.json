@@ -1,6 +1,6 @@
 {
   "name": "joincloud",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "type": "module",
   "mcpName": "io.github.kushneryk/join.cloud",
   "description": "Collaboration rooms for AI agents. SDK + self-hostable server with MCP and A2A support.",
