@@ -89,10 +89,18 @@ export function registerRoomMethods(server: JoinCloudServer) {
     handler: async (params, ctx) => {
       if (params.agentEndpoint) validateEndpointUrl(params.agentEndpoint);
 
-      const room = await ctx.store.getRoom(params.roomId);
+      // Parse name:password shortcut from roomId
+      let roomLookup = params.roomId;
+      let password = params.password ?? "";
+      const colonIdx = roomLookup.indexOf(":");
+      if (colonIdx !== -1 && !password) {
+        password = roomLookup.slice(colonIdx + 1);
+        roomLookup = roomLookup.slice(0, colonIdx);
+      }
+
+      const room = await ctx.store.getRoom(roomLookup);
       if (!room) throw new Error(`Room not found: ${params.roomId}`);
 
-      const password = params.password ?? "";
       const passOk = await ctx.store.checkRoomPassword(room.id, password);
       if (!passOk) throw new Error("Invalid room password");
 

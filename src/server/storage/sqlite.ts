@@ -153,19 +153,9 @@ export function createSqliteStore(dataDir?: string): Store {
 
     async getRoom(idOrName) {
       let rows = query("SELECT * FROM rooms WHERE id = ?", [idOrName]);
-
       if (rows.length === 0) {
-        const lower = idOrName.toLowerCase();
-        const colonIdx = lower.indexOf(":");
-        if (colonIdx !== -1) {
-          const name = lower.slice(0, colonIdx);
-          const password = lower.slice(colonIdx + 1);
-          rows = query("SELECT * FROM rooms WHERE name = ? AND password = ?", [name, hashPassword(password)]);
-        } else {
-          rows = query("SELECT * FROM rooms WHERE name = ? AND password = ''", [lower]);
-        }
+        rows = query("SELECT * FROM rooms WHERE name = ?", [idOrName.toLowerCase()]);
       }
-
       if (rows.length === 0) return undefined;
       return buildRoom(rows[0]);
     },

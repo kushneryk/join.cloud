@@ -75,6 +75,7 @@ function createHandler(registry: MethodRegistry, store: Store) {
         if (metadata) {
           metadata.password = contextId.slice(colonIdx + 1);
         }
+        contextId = contextId.slice(0, colonIdx);
       }
       const room = await store.getRoom(contextId);
       if (room) contextId = room.id;

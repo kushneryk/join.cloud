@@ -42,22 +42,27 @@ export function createGitRoutes(store: Store): Hono {
     const authHeader = c.req.header("authorization");
     const creds = parseBasicAuth(authHeader);
 
-    let room = await store.getRoom(roomSlug);
+    let room = await store.getRoomById(roomSlug);
 
     if (!room) {
       const variants = await store.getRoomsByName(roomSlug);
       if (variants.length === 0) {
         return c.text("Repository not found", 404);
       }
-      if (!creds) {
-        return new Response("Authentication required", {
-          status: 401,
-          headers: { "WWW-Authenticate": `Basic realm="Join.cloud room: ${roomSlug}"` },
-        });
-      }
-      room = await store.getRoomByNameAndPassword(roomSlug, creds.pass);
-      if (!room) {
-        return new Response("Invalid password", { status: 403 });
+      const unprotected = variants.find((v) => !v.hasPassword);
+      if (unprotected) {
+        room = await store.getRoomById(unprotected.id);
+      } else {
+        if (!creds) {
+          return new Response("Authentication required", {
+            status: 401,
+            headers: { "WWW-Authenticate": `Basic realm="Join.cloud room: ${roomSlug}"` },
+          });
+        }
+        room = await store.getRoomByNameAndPassword(roomSlug, creds.pass);
+        if (!room) {
+          return new Response("Invalid password", { status: 403 });
+        }
       }
     }
 
@@ -132,7 +137,7 @@ export function createGitRoutes(store: Store): Hono {
   app.post("/rooms/:slug/git-receive-pack", async (c) => {
     const slug = c.req.param("slug");
 
-    const room = await store.getRoom(slug);
+    const room = await store.getRoomById(slug);
     const refsBeforePush: Record<string, string> = {};
     if (room) {
       try {

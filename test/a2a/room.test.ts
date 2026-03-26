@@ -139,7 +139,7 @@ describe("A2A room.join", () => {
     await a2a("room.create", undefined, name, { password: "correct" });
     const res = await a2a("room.join", `${name}:wrong`, "", { agentName: "agent1" });
     expect(isError(res)).toBe(true);
-    expect(resultText(res)).toContain("not found");
+    expect(resultText(res)).toContain("Invalid room password");
   });
 
   it("rejects reconnect with wrong agentToken", async () => {

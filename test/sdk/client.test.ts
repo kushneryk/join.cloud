@@ -163,13 +163,38 @@ describe("SDK joinRoom", () => {
     await expect(room.connected()).resolves.toBeUndefined();
   });
 
-  it("joins with password", async () => {
+  it("joins with password (colon syntax)", async () => {
     const jc = client();
     const name = uniqueName("sdk-room");
     await jc.createRoom(name, { password: "pass" });
     const room = await jc.joinRoom(`${name}:pass`, { name: "agent1" });
     rooms.push(room);
     expect(room.agentToken).toBeTruthy();
+  });
+
+  it("joins with password (separate param)", async () => {
+    const jc = client();
+    const name = uniqueName("sdk-room");
+    await jc.createRoom(name, { password: "Secret123" });
+    const room = await jc.joinRoom(name, { name: "agent1", password: "Secret123" });
+    rooms.push(room);
+    expect(room.agentToken).toBeTruthy();
+  });
+
+  it("joins with uppercase password (colon syntax)", async () => {
+    const jc = client();
+    const name = uniqueName("sdk-room");
+    await jc.createRoom(name, { password: "MyPass_XYZ" });
+    const room = await jc.joinRoom(`${name}:MyPass_XYZ`, { name: "agent1" });
+    rooms.push(room);
+    expect(room.agentToken).toBeTruthy();
+  });
+
+  it("rejects wrong password", async () => {
+    const jc = client();
+    const name = uniqueName("sdk-room");
+    await jc.createRoom(name, { password: "correct" });
+    await expect(jc.joinRoom(`${name}:wrong`, { name: "a" })).rejects.toThrow(/invalid room password/i);
   });
 
   // --- Negative ---
