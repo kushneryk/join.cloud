@@ -7,6 +7,7 @@ COPY tsconfig.json ./
 COPY src/ src/
 COPY docs/ docs/
 RUN npx tsc
+RUN cp -r src/server/website/docs dist/server/website/docs
 
 FROM node:20-slim
 
