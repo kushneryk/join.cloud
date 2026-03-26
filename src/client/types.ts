@@ -40,3 +40,9 @@ export interface HistoryOptions {
   limit?: number;
   offset?: number;
 }
+
+export interface ListRoomsOptions {
+  search?: string;
+  limit?: number;
+  offset?: number;
+}

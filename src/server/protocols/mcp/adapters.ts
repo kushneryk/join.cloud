@@ -73,8 +73,12 @@ export function registerMcpAdapters(server: { mcp: (name: string, adapter: McpAd
 
   server.mcp("room.list", {
     toolName: "listRooms",
-    description: "List all public rooms on the server.",
-    params: z.object({}),
+    description: "List public rooms on the server. Sorted alphabetically.",
+    params: z.object({
+      search: z.string().optional().describe("Wildcard search by room name"),
+      limit: z.number().optional().describe("Number of rooms (default 20, max 100)"),
+      offset: z.number().optional().describe("Skip N rooms (default 0)"),
+    }),
     annotations: {
       title: "List Rooms",
       readOnlyHint: true,

@@ -10,7 +10,7 @@ export interface Store {
   getRoomById(id: string): Promise<Room | undefined>;
   getRoomsByName(name: string): Promise<Array<{ id: string; hasPassword: boolean }>>;
   getRoomByNameAndPassword(name: string, password: string): Promise<Room | undefined>;
-  listRooms(): Promise<Array<{ name: string; agents: number; createdAt: string }>>;
+  listRooms(options?: { search?: string; limit?: number; offset?: number }): Promise<Array<{ name: string; agents: number; createdAt: string }>>;
   deleteRoom(id: string): Promise<void>;
   checkRoomPassword(id: string, password: string): Promise<boolean>;
 

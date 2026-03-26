@@ -32,12 +32,14 @@ if (hasFlag("server")) {
 
   const serverUrl = flag("url") ?? process.env.JOINCLOUD_URL ?? "https://join.cloud";
   const client = new JoinCloud(serverUrl);
-  const command = args.find((a) => !a.startsWith("--") && args[args.indexOf(a) - 1] !== "--url" && args[args.indexOf(a) - 1] !== "--port" && args[args.indexOf(a) - 1] !== "--name" && args[args.indexOf(a) - 1] !== "--password" && args[args.indexOf(a) - 1] !== "--to" && args[args.indexOf(a) - 1] !== "--limit");
+  const command = args.find((a) => !a.startsWith("--") && args[args.indexOf(a) - 1] !== "--url" && args[args.indexOf(a) - 1] !== "--port" && args[args.indexOf(a) - 1] !== "--name" && args[args.indexOf(a) - 1] !== "--password" && args[args.indexOf(a) - 1] !== "--to" && args[args.indexOf(a) - 1] !== "--limit" && args[args.indexOf(a) - 1] !== "--search");
 
   try {
     switch (command) {
       case "rooms": {
-        const rooms = await client.listRooms();
+        const search = flag("search");
+        const limit = flag("limit") ? parseInt(flag("limit")!) : undefined;
+        const rooms = await client.listRooms({ search, limit });
         if (rooms.length === 0) {
           console.log("No rooms found.");
         } else {
@@ -72,14 +74,24 @@ if (hasFlag("server")) {
         const room = args[args.indexOf("history") + 1];
         if (!room || room.startsWith("--")) { console.error("Usage: joincloud history <room>"); process.exit(1); }
         const limit = flag("limit") ? parseInt(flag("limit")!) : undefined;
-        const jc2 = new JoinCloud(serverUrl, { persist: false });
-        const histRoom = await jc2.joinRoom(room, { name: `cli-${Date.now()}` });
-        const messages = await histRoom.getHistory({ ...(limit && { limit }) });
+        const { findTokenForRoom } = await import("./client/tokens.js");
+        const saved = findTokenForRoom(serverUrl, room);
+        let messages: any[];
+        if (saved) {
+          const jc2 = new JoinCloud(serverUrl, { persist: false });
+          const histRoom = await jc2.joinRoom(room, { name: saved.name, password: flag("password") });
+          messages = await histRoom.getHistory({ ...(limit && { limit }) });
+        } else {
+          const tempName = `cli-${Date.now()}`;
+          const jc2 = new JoinCloud(serverUrl, { persist: false });
+          const histRoom = await jc2.joinRoom(room, { name: tempName, password: flag("password") });
+          messages = await histRoom.getHistory({ ...(limit && { limit }) });
+          await histRoom.leave();
+        }
         for (const m of messages as any[]) {
           const to = m.to ? ` -> ${m.to}` : "";
           console.log(`[${m.timestamp}] ${m.from}${to}: ${m.body}`);
         }
-        await histRoom.leave();
         break;
       }
 

@@ -10,6 +10,7 @@ import type {
   Message,
   SendOptions,
   HistoryOptions,
+  ListRoomsOptions,
 } from "./types.js";
 
 export type {
@@ -21,6 +22,7 @@ export type {
   Message,
   SendOptions,
   HistoryOptions,
+  ListRoomsOptions,
 } from "./types.js";
 
 export class JoinCloud {
@@ -73,8 +75,12 @@ export class JoinCloud {
     return { text: resultText, data: resultData };
   }
 
-  async listRooms(): Promise<RoomSummary[]> {
-    const { data } = await this.rpc("room.list");
+  async listRooms(options: ListRoomsOptions = {}): Promise<RoomSummary[]> {
+    const metadata: Record<string, unknown> = {};
+    if (options.search) metadata.search = options.search;
+    if (options.limit) metadata.limit = options.limit;
+    if (options.offset) metadata.offset = options.offset;
+    const { data } = await this.rpc("room.list", undefined, undefined, Object.keys(metadata).length > 0 ? metadata : undefined);
     return (data?.rooms as RoomSummary[]) ?? [];
   }
 

@@ -19,8 +19,6 @@ RUN npm ci
 COPY docs/ docs/
 COPY --from=build /app/dist dist/
 
-ENV PORT=3000
-ENV MCP_PORT=3003
 ENV REPOS_DIR=/tmp/joincloud-repos
 
 EXPOSE 3000 3003

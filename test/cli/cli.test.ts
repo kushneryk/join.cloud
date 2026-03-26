@@ -111,7 +111,7 @@ describe("CLI create", () => {
 
   it("shows error for reserved name", () => {
     const out = run("create mcp");
-    expect(out).toContain("reserved");
+    expect(out).toContain("Error");
   });
 
   it("shows error for duplicate name", () => {

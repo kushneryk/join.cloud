@@ -34,6 +34,18 @@ export function saveToken(server: string, room: string, name: string, token: str
   save(store);
 }
 
+export function findTokenForRoom(server: string, room: string): { name: string; token: string } | undefined {
+  const store = load();
+  const prefix = `${server}|${room}|`;
+  for (const [k, token] of Object.entries(store)) {
+    if (k.startsWith(prefix)) {
+      const name = k.slice(prefix.length);
+      return { name, token };
+    }
+  }
+  return undefined;
+}
+
 export function removeToken(server: string, room: string, name: string): void {
   const store = load();
   delete store[key(server, room, name)];

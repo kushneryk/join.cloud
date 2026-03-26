@@ -187,10 +187,18 @@ export function registerRoomMethods(server: JoinCloudServer) {
   });
 
   server.method("room.list", {
-    description: "List all rooms",
-    params: z.object({}),
-    handler: async (_params, ctx) => {
-      const list = await ctx.store.listRooms();
+    description: "List public rooms (default 20, max 100). Sorted alphabetically.",
+    params: z.object({
+      search: z.string().optional().describe("Wildcard search by room name"),
+      limit: z.number().optional().describe("Number of rooms to return (default 20, max 100)"),
+      offset: z.number().optional().describe("Skip N rooms (default 0)"),
+    }),
+    handler: async (params, ctx) => {
+      const list = await ctx.store.listRooms({
+        search: params.search,
+        limit: params.limit,
+        offset: params.offset,
+      });
       return {
         text: JSON.stringify(list, null, 2),
         data: { rooms: list },

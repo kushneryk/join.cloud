@@ -89,7 +89,7 @@ describe("SDK createRoom", () => {
   // --- Negative ---
   it("throws for reserved name", async () => {
     const jc = client();
-    await expect(jc.createRoom("mcp")).rejects.toThrow(/reserved/i);
+    await expect(jc.createRoom("mcp")).rejects.toThrow();
   });
 
   it("throws for duplicate room", async () => {

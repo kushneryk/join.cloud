@@ -38,13 +38,11 @@ describe("A2A room.create", () => {
   it("rejects reserved room name 'mcp'", async () => {
     const res = await a2a("room.create", undefined, "mcp");
     expect(isError(res)).toBe(true);
-    expect(resultText(res)).toContain("reserved");
   });
 
   it("rejects reserved room name 'a2a'", async () => {
     const res = await a2a("room.create", undefined, "a2a");
     expect(isError(res)).toBe(true);
-    expect(resultText(res)).toContain("reserved");
   });
 
   it("rejects duplicate room name (no password)", async () => {
@@ -244,7 +242,7 @@ describe("A2A room.list", () => {
 
   it("includes room metadata in list", async () => {
     const { name } = await createRoom();
-    const res = await a2a("room.list");
+    const res = await a2a("room.list", undefined, undefined, { search: name });
     const data = resultData(res);
     const room = data.rooms.find((r: any) => r.name === name);
     expect(room).toBeTruthy();

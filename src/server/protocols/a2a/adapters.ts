@@ -31,7 +31,11 @@ export function registerA2aAdapters(server: { a2a: (name: string, adapter: A2aAd
   });
 
   server.a2a("room.list", {
-    mapParams: () => ({}),
+    mapParams: (msg) => ({
+      search: msg.metadata?.search,
+      limit: msg.metadata?.limit,
+      offset: msg.metadata?.offset,
+    }),
   });
 
   server.a2a("message.send", {

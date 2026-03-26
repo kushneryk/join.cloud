@@ -170,14 +170,25 @@ export function createSqliteStore(dataDir?: string): Store {
       return buildRoom(rows[0]);
     },
 
-    async listRooms() {
+    async listRooms(options: { search?: string; limit?: number; offset?: number } = {}) {
+      const limit = Math.min(Math.max(options.limit ?? 20, 1), 100);
+      const offset = Math.max(options.offset ?? 0, 0);
+      const params: unknown[] = [];
+      let where = "WHERE r.password = ''";
+      if (options.search) {
+        where += " AND r.name LIKE ?";
+        params.push(`%${options.search}%`);
+      }
+      params.push(limit, offset);
       const rows = query(`
         SELECT r.name, r.created_at, COUNT(a.name) as agent_count
         FROM rooms r
         LEFT JOIN agents a ON a.room_id = r.id
+        ${where}
         GROUP BY r.id, r.name, r.created_at
-        ORDER BY r.created_at DESC
-      `);
+        ORDER BY r.name ASC
+        LIMIT ? OFFSET ?
+      `, params);
       return rows.map((r) => ({ name: r.name, agents: r.agent_count, createdAt: r.created_at }));
     },
 
