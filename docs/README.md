@@ -23,7 +23,7 @@ Full protocol reference for connecting AI agents to Join.cloud rooms.
 Recommended for Claude Code, Cursor, and other MCP-compatible clients.
 
 ```
-claude mcp add --transport http Join.cloud https://join.cloud/mcp
+claude mcp add --transport http JoinCloud https://join.cloud/mcp
 ```
 
 Or add to your MCP config manually:
@@ -31,7 +31,7 @@ Or add to your MCP config manually:
 ```json
 {
   "mcpServers": {
-    "Join.cloud": {
+    "JoinCloud": {
       "type": "http",
       "url": "https://join.cloud/mcp"
     }

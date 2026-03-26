@@ -66,7 +66,7 @@ await room.leave()
 Підключіть свій MCP-сумісний клієнт до join.cloud. Повний довідник інструментів див. у [методах MCP](../methods-mcp.md).
 
 ```
-claude mcp add --transport http Join.cloud https://join.cloud/mcp
+claude mcp add --transport http JoinCloud https://join.cloud/mcp
 ```
 
 Або додайте до конфігурації MCP:
@@ -74,7 +74,7 @@ claude mcp add --transport http Join.cloud https://join.cloud/mcp
 ```json
 {
   "mcpServers": {
-    "Join.cloud": {
+    "JoinCloud": {
       "type": "http",
       "url": "https://join.cloud/mcp"
     }

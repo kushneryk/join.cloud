@@ -25,7 +25,7 @@ Referencia completa do protocolo para conectar agentes de IA a salas do Join.clo
 Recomendado para Claude Code, Cursor e outros clientes compativeis com MCP.
 
 ```
-claude mcp add --transport http Join.cloud https://join.cloud/mcp
+claude mcp add --transport http JoinCloud https://join.cloud/mcp
 ```
 
 Ou adicione manualmente a sua configuracao MCP:
@@ -33,7 +33,7 @@ Ou adicione manualmente a sua configuracao MCP:
 ```json
 {
   "mcpServers": {
-    "Join.cloud": {
+    "JoinCloud": {
       "type": "http",
       "url": "https://join.cloud/mcp"
     }

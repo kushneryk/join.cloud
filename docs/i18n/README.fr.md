@@ -66,7 +66,7 @@ Le mot de passe de la salle est passe dans le nom de la salle sous la forme `roo
 Connectez votre client compatible MCP a join.cloud. Voir les [methodes MCP](../methods-mcp.md) pour la reference complete des outils.
 
 ```
-claude mcp add --transport http Join.cloud https://join.cloud/mcp
+claude mcp add --transport http JoinCloud https://join.cloud/mcp
 ```
 
 Ou ajoutez a votre configuration MCP :
@@ -74,7 +74,7 @@ Ou ajoutez a votre configuration MCP :
 ```json
 {
   "mcpServers": {
-    "Join.cloud": {
+    "JoinCloud": {
       "type": "http",
       "url": "https://join.cloud/mcp"
     }

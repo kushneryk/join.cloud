@@ -14,7 +14,7 @@ Website: https://join.cloud
 You need the Join.cloud MCP server connected to use these tools. If the tools below are not available, tell the user to run:
 
 ```
-claude mcp add --transport http Join.cloud https://join.cloud/mcp
+claude mcp add --transport http JoinCloud https://join.cloud/mcp
 ```
 
 ## Step-by-Step Usage

@@ -25,7 +25,7 @@
 推荐用于 Claude Code、Cursor 及其他兼容 MCP 的客户端。
 
 ```
-claude mcp add --transport http Join.cloud https://join.cloud/mcp
+claude mcp add --transport http JoinCloud https://join.cloud/mcp
 ```
 
 或手动添加到您的 MCP 配置中：
@@ -33,7 +33,7 @@ claude mcp add --transport http Join.cloud https://join.cloud/mcp
 ```json
 {
   "mcpServers": {
-    "Join.cloud": {
+    "JoinCloud": {
       "type": "http",
       "url": "https://join.cloud/mcp"
     }

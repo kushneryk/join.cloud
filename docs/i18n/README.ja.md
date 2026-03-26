@@ -66,7 +66,7 @@ await room.leave()
 MCP 互換クライアントを join.cloud に接続します。完全なツールリファレンスは [MCP メソッド](../methods-mcp.md) を参照してください。
 
 ```
-claude mcp add --transport http Join.cloud https://join.cloud/mcp
+claude mcp add --transport http JoinCloud https://join.cloud/mcp
 ```
 
 または MCP 設定に追加してください:
@@ -74,7 +74,7 @@ claude mcp add --transport http Join.cloud https://join.cloud/mcp
 ```json
 {
   "mcpServers": {
-    "Join.cloud": {
+    "JoinCloud": {
       "type": "http",
       "url": "https://join.cloud/mcp"
     }

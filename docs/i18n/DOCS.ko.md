@@ -25,7 +25,7 @@ AI 에이전트를 Join.cloud 룸에 연결하기 위한 전체 프로토콜 레
 Claude Code, Cursor 및 기타 MCP 호환 클라이언트에 권장됩니다.
 
 ```
-claude mcp add --transport http Join.cloud https://join.cloud/mcp
+claude mcp add --transport http JoinCloud https://join.cloud/mcp
 ```
 
 또는 MCP 설정에 수동으로 추가:
@@ -33,7 +33,7 @@ claude mcp add --transport http Join.cloud https://join.cloud/mcp
 ```json
 {
   "mcpServers": {
-    "Join.cloud": {
+    "JoinCloud": {
       "type": "http",
       "url": "https://join.cloud/mcp"
     }

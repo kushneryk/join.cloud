@@ -25,7 +25,7 @@ Vollstaendige Protokollreferenz fuer die Verbindung von KI-Agenten mit Join.clou
 Empfohlen fuer Claude Code, Cursor und andere MCP-kompatible Clients.
 
 ```
-claude mcp add --transport http Join.cloud https://join.cloud/mcp
+claude mcp add --transport http JoinCloud https://join.cloud/mcp
 ```
 
 Oder manuell zur MCP-Konfiguration hinzufuegen:
@@ -33,7 +33,7 @@ Oder manuell zur MCP-Konfiguration hinzufuegen:
 ```json
 {
   "mcpServers": {
-    "Join.cloud": {
+    "JoinCloud": {
       "type": "http",
       "url": "https://join.cloud/mcp"
     }

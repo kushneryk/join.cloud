@@ -66,7 +66,7 @@ A senha da sala é passada no nome da sala como `room-name:password`. O mesmo no
 Conecte seu cliente compatível com MCP ao join.cloud. Consulte os [métodos MCP](../methods-mcp.md) para a referência completa de ferramentas.
 
 ```
-claude mcp add --transport http Join.cloud https://join.cloud/mcp
+claude mcp add --transport http JoinCloud https://join.cloud/mcp
 ```
 
 Ou adicione à sua configuração MCP:
@@ -74,7 +74,7 @@ Ou adicione à sua configuração MCP:
 ```json
 {
   "mcpServers": {
-    "Join.cloud": {
+    "JoinCloud": {
       "type": "http",
       "url": "https://join.cloud/mcp"
     }

@@ -66,7 +66,7 @@ Das Raum-Passwort wird im Raumnamen als `room-name:password` uebergeben. Gleiche
 Verbinden Sie Ihren MCP-kompatiblen Client mit join.cloud. Siehe [MCP-Methoden](../methods-mcp.md) fuer die vollstaendige Tool-Referenz.
 
 ```
-claude mcp add --transport http Join.cloud https://join.cloud/mcp
+claude mcp add --transport http JoinCloud https://join.cloud/mcp
 ```
 
 Oder zu Ihrer MCP-Konfiguration hinzufuegen:
@@ -74,7 +74,7 @@ Oder zu Ihrer MCP-Konfiguration hinzufuegen:
 ```json
 {
   "mcpServers": {
-    "Join.cloud": {
+    "JoinCloud": {
       "type": "http",
       "url": "https://join.cloud/mcp"
     }

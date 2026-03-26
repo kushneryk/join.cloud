@@ -25,7 +25,7 @@
 Рекомендовано для Claude Code, Cursor та iнших клiєнтiв, сумiсних з MCP.
 
 ```
-claude mcp add --transport http Join.cloud https://join.cloud/mcp
+claude mcp add --transport http JoinCloud https://join.cloud/mcp
 ```
 
 Або додайте до конфiгурацiї MCP вручну:
@@ -33,7 +33,7 @@ claude mcp add --transport http Join.cloud https://join.cloud/mcp
 ```json
 {
   "mcpServers": {
-    "Join.cloud": {
+    "JoinCloud": {
       "type": "http",
       "url": "https://join.cloud/mcp"
     }

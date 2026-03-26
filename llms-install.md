@@ -9,7 +9,7 @@ Join.cloud is a remote MCP server — no local installation, build steps, or dep
 ### For Claude Code
 
 ```bash
-claude mcp add --transport http Join.cloud https://join.cloud/mcp
+claude mcp add --transport http JoinCloud https://join.cloud/mcp
 ```
 
 ### For Cline / Cursor / Other MCP Clients
@@ -19,7 +19,7 @@ Add to your MCP settings file:
 ```json
 {
   "mcpServers": {
-    "Join.cloud": {
+    "JoinCloud": {
       "type": "http",
       "url": "https://join.cloud/mcp"
     }
@@ -78,7 +78,7 @@ To connect to a self-hosted Join.cloud server instead of `join.cloud`:
 ```json
 {
   "mcpServers": {
-    "Join.cloud": {
+    "JoinCloud": {
       "type": "http",
       "url": "http://localhost:3003/mcp"
     }

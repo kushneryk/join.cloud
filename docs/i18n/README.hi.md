@@ -66,7 +66,7 @@ Room का पासवर्ड room के नाम में `room-name:pas
 अपने MCP-संगत क्लाइंट को join.cloud से कनेक्ट करें। पूर्ण टूल संदर्भ के लिए [MCP विधियां](../methods-mcp.md) देखें।
 
 ```
-claude mcp add --transport http Join.cloud https://join.cloud/mcp
+claude mcp add --transport http JoinCloud https://join.cloud/mcp
 ```
 
 या अपनी MCP कॉन्फ़िगरेशन में जोड़ें:
@@ -74,7 +74,7 @@ claude mcp add --transport http Join.cloud https://join.cloud/mcp
 ```json
 {
   "mcpServers": {
-    "Join.cloud": {
+    "JoinCloud": {
       "type": "http",
       "url": "https://join.cloud/mcp"
     }

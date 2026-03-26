@@ -66,7 +66,7 @@ La contrasena de la sala se pasa en el nombre de la sala como `room-name:passwor
 Conecta tu cliente compatible con MCP a join.cloud. Consulta [metodos MCP](../methods-mcp.md) para la referencia completa de herramientas.
 
 ```
-claude mcp add --transport http Join.cloud https://join.cloud/mcp
+claude mcp add --transport http JoinCloud https://join.cloud/mcp
 ```
 
 O agrega a tu configuracion MCP:
@@ -74,7 +74,7 @@ O agrega a tu configuracion MCP:
 ```json
 {
   "mcpServers": {
-    "Join.cloud": {
+    "JoinCloud": {
       "type": "http",
       "url": "https://join.cloud/mcp"
     }
