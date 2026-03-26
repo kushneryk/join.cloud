@@ -7,8 +7,8 @@ export function createAgentCardRoutes(registry: MethodRegistry, baseUrl: string)
 
   app.get("/.well-known/glama.json", (c) => {
     return c.json({
-      "$schema": "https://glama.ai/mcp/schemas/connector.json",
-      maintainers: [{ email: "khunartem@gmail.com" }],
+      "$schema": "https://glama.ai/mcp/schemas/server.json",
+      maintainers: ["kushneryk"],
     });
   });
 
