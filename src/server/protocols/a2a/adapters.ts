@@ -54,4 +54,10 @@ export function registerA2aAdapters(server: { a2a: (name: string, adapter: A2aAd
       offset: msg.metadata?.offset,
     }),
   });
+
+  server.a2a("message.unread", {
+    mapParams: (msg) => ({
+      agentToken: msg.metadata?.agentToken,
+    }),
+  });
 }

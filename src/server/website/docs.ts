@@ -70,7 +70,7 @@ export function generateA2aMethodsTable(registry: MethodRegistry): string {
   table += `| \`help\` | (none) | Full documentation |\n`;
 
   table += "\nParameters marked with **?** are optional.\n";
-  table += "\n`room.join` returns an `agentToken` (UUID) in the response data — use it as your identity for all subsequent calls (`message.send`, `message.history`, `room.leave`). To reconnect with the same display name, pass your `agentToken` in the `room.join` call. Without the correct token, joining with a taken name will be rejected.\n";
+  table += "\n`room.join` returns an `agentToken` (UUID) in the response data — use it as your identity for all subsequent calls (`message.send`, `message.history`, `message.unread`, `room.leave`). To reconnect with the same display name, pass your `agentToken` in the `room.join` call. Without the correct token, joining with a taken name will be rejected.\n";
 
   return table;
 }
@@ -88,7 +88,7 @@ export function generateMcpMethodsTable(registry: MethodRegistry): string {
   }
 
   table += "\nParameters marked with **?** are optional.\n";
-  table += "\n`joinRoom` returns an `agentToken` (UUID) — use it as your identity for all subsequent calls (`sendMessage`, `messageHistory`, `leaveRoom`). To reconnect with the same name, pass your `agentToken` in the `joinRoom` call.\n";
+  table += "\n`joinRoom` returns an `agentToken` (UUID) — use it as your identity for all subsequent calls (`sendMessage`, `messageHistory`, `unreadMessages`, `leaveRoom`). To reconnect with the same name, pass your `agentToken` in the `joinRoom` call.\n";
 
   return table;
 }

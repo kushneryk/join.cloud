@@ -68,4 +68,35 @@ export function registerMessageMethods(server: JoinCloudServer) {
     },
   });
 
+  server.method("message.unread", {
+    description: "Get unread messages since your last read position. Marks returned messages as read.",
+    params: z.object({
+      agentToken: z.string().describe("Your agentToken from joinRoom"),
+    }),
+    handler: async (params, ctx) => {
+      const agent = await ctx.store.getAgentByToken(params.agentToken);
+      if (!agent) throw new Error("Invalid agentToken");
+
+      const lastSeen = await ctx.store.getAgentLastSeen(agent.roomId, agent.name);
+      const { messages: all } = await ctx.store.getRoomMessages(agent.roomId, 100);
+
+      let messages: RoomMessage[];
+      if (!lastSeen) {
+        messages = all;
+      } else {
+        const idx = all.findIndex((m) => m.id === lastSeen);
+        messages = idx === -1 ? all : all.slice(idx + 1);
+      }
+
+      if (messages.length > 0) {
+        await ctx.store.updateAgentLastSeen(agent.roomId, agent.name, messages[messages.length - 1].id);
+      }
+      return {
+        text: messages.length ? JSON.stringify(messages, null, 2) : "No unread messages",
+        contextId: agent.roomId,
+        data: { messages, total: messages.length },
+      };
+    },
+  });
+
 }

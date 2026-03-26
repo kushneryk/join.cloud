@@ -54,6 +54,7 @@ const ACTION_ALIASES: Record<string, string> = {
   "list": "room.list",
   "send": "message.send",
   "history": "message.history",
+  "unread": "message.unread",
 };
 
 function createHandler(registry: MethodRegistry, store: Store) {

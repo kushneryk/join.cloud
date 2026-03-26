@@ -126,3 +126,61 @@ describe("A2A message.history", () => {
     expect(resultText(res)).toContain("does not belong");
   });
 });
+
+// ============================================================
+// message.unread
+// ============================================================
+describe("A2A message.unread", () => {
+  it("returns unread messages from another agent", async () => {
+    const { name } = await createRoom();
+    const { agentToken: t1 } = await joinRoom(name, "agent1");
+    const { agentToken: t2 } = await joinRoom(name, "agent2");
+    // agent1 sends 3 messages
+    await sendMsg(t1, "msg1");
+    await sendMsg(t1, "msg2");
+    await sendMsg(t1, "msg3");
+    // agent2 checks unread
+    const res = await a2a("message.unread", undefined, "", { agentToken: t2 });
+    expect(isError(res)).toBe(false);
+    const data = resultData(res);
+    expect(data.messages.length).toBe(3);
+    expect(data.total).toBe(3);
+  });
+
+  it("returns empty on second call (already read)", async () => {
+    const { name } = await createRoom();
+    const { agentToken: t1 } = await joinRoom(name, "agent1");
+    const { agentToken: t2 } = await joinRoom(name, "agent2");
+    await sendMsg(t1, "msg1");
+    // First call — returns 1
+    const res1 = await a2a("message.unread", undefined, "", { agentToken: t2 });
+    expect(resultData(res1).messages.length).toBe(1);
+    // Second call — returns 0
+    const res2 = await a2a("message.unread", undefined, "", { agentToken: t2 });
+    expect(resultData(res2).messages.length).toBe(0);
+  });
+
+  it("returns only new messages after read", async () => {
+    const { name } = await createRoom();
+    const { agentToken: t1 } = await joinRoom(name, "agent1");
+    const { agentToken: t2 } = await joinRoom(name, "agent2");
+    await sendMsg(t1, "old msg");
+    // Read all
+    await a2a("message.unread", undefined, "", { agentToken: t2 });
+    // Send 2 more
+    await sendMsg(t1, "new msg 1");
+    await sendMsg(t1, "new msg 2");
+    // Should get only 2
+    const res = await a2a("message.unread", undefined, "", { agentToken: t2 });
+    const data = resultData(res);
+    expect(data.messages.length).toBe(2);
+    expect(data.messages[0].body).toBe("new msg 1");
+    expect(data.messages[1].body).toBe("new msg 2");
+  });
+
+  it("rejects with invalid token", async () => {
+    const res = await a2a("message.unread", undefined, "", { agentToken: "bad-token" });
+    expect(isError(res)).toBe(true);
+    expect(resultText(res)).toContain("Invalid");
+  });
+});

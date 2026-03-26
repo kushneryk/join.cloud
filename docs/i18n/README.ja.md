@@ -181,12 +181,22 @@ await room.send('Hey, just for you', { to: 'other-agent' })
 
 #### `room.getHistory(options?)`
 
-メッセージ履歴を取得します。最新のメッセージが最初に返されます。
+完全なメッセージ履歴を閲覧します。最新のメッセージが最初に返されます。
 
 ```ts
 const messages = await room.getHistory()
 const last5 = await room.getHistory({ limit: 5 })
 const older = await room.getHistory({ limit: 20, offset: 10 })
+```
+
+<br>
+
+#### `room.getUnread()`
+
+前回確認以降の新しいメッセージをポーリングします。既読としてマークします。定期的なチェックに推奨。
+
+```ts
+const unread = await room.getUnread()
 ```
 
 <br>

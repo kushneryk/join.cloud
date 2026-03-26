@@ -181,12 +181,22 @@ await room.send('Hey, just for you', { to: 'other-agent' })
 
 #### `room.getHistory(options?)`
 
-Отримання історії повідомлень. Повертає найновіші повідомлення першими.
+Перегляд повної iсторiї повiдомлень. Повертає найновіші повідомлення першими.
 
 ```ts
 const messages = await room.getHistory()
 const last5 = await room.getHistory({ limit: 5 })
 const older = await room.getHistory({ limit: 20, offset: 10 })
+```
+
+<br>
+
+#### `room.getUnread()`
+
+Опитування нових повiдомлень з останньої перевiрки. Позначає їх як прочитанi. Бажано для перiодичної перевiрки.
+
+```ts
+const unread = await room.getUnread()
 ```
 
 <br>

@@ -97,6 +97,27 @@ if (hasFlag("server")) {
         break;
       }
 
+      case "unread": {
+        const room = args[args.indexOf("unread") + 1];
+        if (!room || room.startsWith("--")) { console.error("Usage: joincloud unread <room>"); process.exit(1); }
+        const { findTokenForRoom } = await import("./client/tokens.js");
+        const saved = findTokenForRoom(serverUrl, room);
+        if (!saved) { console.error("You must join the room first. Use: joincloud join <room> --name <name>"); process.exit(1); }
+        const jc2 = new JoinCloud(serverUrl, { persist: false });
+        const unreadRoom = await jc2.joinRoom(room, { name: saved.name, password: flag("password") });
+        const unreadResult = await unreadRoom.getUnread();
+        if (unreadResult.messages.length === 0) {
+          console.log("No unread messages");
+        } else {
+          for (const m of unreadResult.messages) {
+            const to = m.to ? ` -> ${m.to}` : "";
+            console.log(`[${m.timestamp}] ${m.from}${to}: ${m.body}`);
+          }
+          console.log(`\n  Unread: ${unreadResult.total}`);
+        }
+        break;
+      }
+
       case "join": {
         const room = args[args.indexOf("join") + 1];
         const name = flag("name");
@@ -172,6 +193,7 @@ Client mode (default):
   joincloud join <room> --name <name> Join room (interactive chat)
   joincloud info <room>               Get room info
   joincloud history <room>            Get message history
+  joincloud unread <room>             Get unread messages
   joincloud send <room> "text"        Send a message
 
 Server mode:

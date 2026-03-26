@@ -16,7 +16,8 @@ This server receives MCP tool calls over stdin/stdout (JSON-RPC) and forwards th
 | `roomInfo` | Get room details and participants |
 | `listRooms` | List public rooms |
 | `sendMessage` | Send a message (broadcast or DM) |
-| `messageHistory` | Get message history |
+| `messageHistory` | Browse full message history |
+| `unreadMessages` | Poll for new messages since last check |
 
 ## Build & Run
 

@@ -24,7 +24,8 @@ describe("MCP tools/list", () => {
     expect(names).toContain("listRooms");
     expect(names).toContain("sendMessage");
     expect(names).toContain("messageHistory");
-    expect(names.length).toBe(7);
+    expect(names).toContain("unreadMessages");
+    expect(names.length).toBe(8);
   });
 
   it("each tool has description and inputSchema", async () => {

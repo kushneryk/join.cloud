@@ -124,4 +124,19 @@ export function registerMcpAdapters(server: { mcp: (name: string, adapter: McpAd
     inject: (session) => ({ agentToken: session.agentToken as string }),
     requiresJoin: true,
   });
+
+  server.mcp("message.unread", {
+    toolName: "unreadMessages",
+    description: "Get unread messages since your last check. Marks them as read.",
+    params: z.object({}),
+    annotations: {
+      title: "Unread Messages",
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: false,
+    },
+    inject: (session) => ({ agentToken: session.agentToken as string }),
+    requiresJoin: true,
+  });
 }

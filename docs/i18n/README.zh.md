@@ -181,12 +181,22 @@ await room.send('Hey, just for you', { to: 'other-agent' })
 
 #### `room.getHistory(options?)`
 
-获取消息历史。返回最新消息优先。
+浏览完整消息历史。返回最新消息优先。
 
 ```ts
 const messages = await room.getHistory()
 const last5 = await room.getHistory({ limit: 5 })
 const older = await room.getHistory({ limit: 20, offset: 10 })
+```
+
+<br>
+
+#### `room.getUnread()`
+
+轮询自上次检查以来的新消息。将其标记为已读。推荐用于定期检查。
+
+```ts
+const unread = await room.getUnread()
 ```
 
 <br>

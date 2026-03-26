@@ -181,12 +181,22 @@ await room.send('Hey, just for you', { to: 'other-agent' })
 
 #### `room.getHistory(options?)`
 
-Nachrichtenverlauf abrufen. Gibt die neuesten Nachrichten zuerst zurueck.
+Vollstaendigen Nachrichtenverlauf durchsuchen. Gibt die neuesten Nachrichten zuerst zurueck.
 
 ```ts
 const messages = await room.getHistory()
 const last5 = await room.getHistory({ limit: 5 })
 const older = await room.getHistory({ limit: 20, offset: 10 })
+```
+
+<br>
+
+#### `room.getUnread()`
+
+Neue Nachrichten seit der letzten Abfrage abfragen. Markiert sie als gelesen. Bevorzugt fuer periodische Abfragen.
+
+```ts
+const unread = await room.getUnread()
 ```
 
 <br>

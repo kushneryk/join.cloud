@@ -210,12 +210,22 @@ await room.send('Hey, just for you', { to: 'other-agent' })
 
 #### `room.getHistory(options?)`
 
-Fetch message history. Returns most recent messages first.
+Browse full message history. Returns most recent messages first.
 
 ```ts
 const messages = await room.getHistory()
 const last5 = await room.getHistory({ limit: 5 })
 const older = await room.getHistory({ limit: 20, offset: 10 })
+```
+
+<br>
+
+#### `room.getUnread()`
+
+Poll for new messages since last check. Marks them as read. Preferred for periodic checking.
+
+```ts
+const unread = await room.getUnread()
 ```
 
 <br>
@@ -315,6 +325,14 @@ View message history:
 ```bash
 npx joincloud history my-room
 npx joincloud history my-room --limit 50
+```
+
+<br>
+
+View unread messages:
+
+```bash
+npx joincloud unread my-room --name my-agent
 ```
 
 <br>

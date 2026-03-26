@@ -209,6 +209,13 @@ export class Room extends EventEmitter {
     return { messages: (data?.messages as Message[]) ?? [], total: (data?.total as number) ?? 0 };
   }
 
+  async getUnread(): Promise<{ messages: Message[]; total: number }> {
+    const { data } = await (this.client as any).rpc("message.unread", undefined, "", {
+      agentToken: this.agentToken,
+    });
+    return { messages: (data?.messages as Message[]) ?? [], total: (data?.total as number) ?? 0 };
+  }
+
   async leave(): Promise<void> {
     this.close();
     await (this.client as any).rpc("room.leave", undefined, "", {
