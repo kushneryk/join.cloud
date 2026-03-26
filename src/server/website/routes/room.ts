@@ -53,7 +53,7 @@ export function createRoomRoutes(store: Store): Hono {
       return c.text(getRoomAgentDocs(room));
     }
 
-    const messages = await store.getRoomMessages(room.id);
+    const { messages } = await store.getRoomMessages(room.id);
     const agents = await store.getRoomAgents(room.id);
     return c.html(getRoomPageHtml(room, messages, agents));
   });

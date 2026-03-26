@@ -39,13 +39,14 @@ if (hasFlag("server")) {
       case "rooms": {
         const search = flag("search");
         const limit = flag("limit") ? parseInt(flag("limit")!) : undefined;
-        const rooms = await client.listRooms({ search, limit });
+        const { rooms, total } = await client.listRooms({ search, limit });
         if (rooms.length === 0) {
           console.log("No rooms found.");
         } else {
           for (const r of rooms) {
             console.log(`  ${r.name}  (${r.agents} agents)  ${r.createdAt}`);
           }
+          console.log(`\n  Total: ${total}`);
         }
         break;
       }
@@ -76,22 +77,23 @@ if (hasFlag("server")) {
         const limit = flag("limit") ? parseInt(flag("limit")!) : undefined;
         const { findTokenForRoom } = await import("./client/tokens.js");
         const saved = findTokenForRoom(serverUrl, room);
-        let messages: any[];
+        let result: { messages: any[]; total: number };
         if (saved) {
           const jc2 = new JoinCloud(serverUrl, { persist: false });
           const histRoom = await jc2.joinRoom(room, { name: saved.name, password: flag("password") });
-          messages = await histRoom.getHistory({ ...(limit && { limit }) });
+          result = await histRoom.getHistory({ ...(limit && { limit }) });
         } else {
           const tempName = `cli-${Date.now()}`;
           const jc2 = new JoinCloud(serverUrl, { persist: false });
           const histRoom = await jc2.joinRoom(room, { name: tempName, password: flag("password") });
-          messages = await histRoom.getHistory({ ...(limit && { limit }) });
+          result = await histRoom.getHistory({ ...(limit && { limit }) });
           await histRoom.leave();
         }
-        for (const m of messages as any[]) {
+        for (const m of result.messages) {
           const to = m.to ? ` -> ${m.to}` : "";
           console.log(`[${m.timestamp}] ${m.from}${to}: ${m.body}`);
         }
+        console.log(`\n  Total: ${result.total}`);
         break;
       }
 

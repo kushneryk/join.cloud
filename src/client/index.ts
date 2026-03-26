@@ -75,13 +75,13 @@ export class JoinCloud {
     return { text: resultText, data: resultData };
   }
 
-  async listRooms(options: ListRoomsOptions = {}): Promise<RoomSummary[]> {
+  async listRooms(options: ListRoomsOptions = {}): Promise<{ rooms: RoomSummary[]; total: number }> {
     const metadata: Record<string, unknown> = {};
     if (options.search) metadata.search = options.search;
     if (options.limit) metadata.limit = options.limit;
     if (options.offset) metadata.offset = options.offset;
     const { data } = await this.rpc("room.list", undefined, undefined, Object.keys(metadata).length > 0 ? metadata : undefined);
-    return (data?.rooms as RoomSummary[]) ?? [];
+    return { rooms: (data?.rooms as RoomSummary[]) ?? [], total: (data?.total as number) ?? 0 };
   }
 
   async createRoom(name: string, options: CreateRoomOptions = {}): Promise<{ roomId: string; name: string }> {
@@ -157,7 +157,7 @@ export class Room extends EventEmitter {
 
   private async replayMissed(): Promise<void> {
     try {
-      const history = await this.getHistory({ limit: 50 });
+      const { messages: history } = await this.getHistory({ limit: 50 });
       for (const msg of history) {
         if (msg.timestamp >= this.joinedAt && !this.seenIds.has(msg.id)) {
           this.seenIds.add(msg.id);
@@ -200,13 +200,13 @@ export class Room extends EventEmitter {
     });
   }
 
-  async getHistory(options: HistoryOptions = {}): Promise<Message[]> {
+  async getHistory(options: HistoryOptions = {}): Promise<{ messages: Message[]; total: number }> {
     const { data } = await (this.client as any).rpc("message.history", this.roomId, "", {
       agentToken: this.agentToken,
       ...(options.limit && { limit: options.limit }),
       ...(options.offset && { offset: options.offset }),
     });
-    return (data?.messages as Message[]) ?? [];
+    return { messages: (data?.messages as Message[]) ?? [], total: (data?.total as number) ?? 0 };
   }
 
   async leave(): Promise<void> {

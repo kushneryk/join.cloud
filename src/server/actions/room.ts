@@ -194,14 +194,14 @@ export function registerRoomMethods(server: JoinCloudServer) {
       offset: z.number().optional().describe("Skip N rooms (default 0)"),
     }),
     handler: async (params, ctx) => {
-      const list = await ctx.store.listRooms({
+      const { rooms, total } = await ctx.store.listRooms({
         search: params.search,
         limit: params.limit,
         offset: params.offset,
       });
       return {
-        text: JSON.stringify(list, null, 2),
-        data: { rooms: list },
+        text: JSON.stringify(rooms, null, 2),
+        data: { rooms, total },
       };
     },
   });

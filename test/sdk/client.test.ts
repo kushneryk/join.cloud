@@ -43,16 +43,17 @@ describe("SDK listRooms", () => {
   it("returns array of rooms", async () => {
     const jc = client();
     await jc.createRoom(uniqueName("sdk-room"));
-    const list = await jc.listRooms();
+    const { rooms: list, total } = await jc.listRooms();
     expect(list).toBeInstanceOf(Array);
     expect(list.length).toBeGreaterThan(0);
+    expect(typeof total).toBe("number");
   });
 
   it("rooms have expected fields", async () => {
     const jc = client();
     const name = uniqueName("sdk-room");
     await jc.createRoom(name);
-    const list = await jc.listRooms();
+    const { rooms: list } = await jc.listRooms();
     const room = list.find((r) => r.name === name);
     expect(room).toBeTruthy();
     expect(room!.createdAt).toBeTruthy();
@@ -227,7 +228,7 @@ describe("SDK Room.send", () => {
 // ============================================================
 describe("SDK Room.getHistory", () => {
   // --- Positive ---
-  it("returns message array", async () => {
+  it("returns message array with total", async () => {
     const jc = client();
     const name = uniqueName("sdk-room");
     await jc.createRoom(name);
@@ -235,9 +236,10 @@ describe("SDK Room.getHistory", () => {
     rooms.push(room);
     await room.send("msg1");
     await room.send("msg2");
-    const msgs = await room.getHistory();
+    const { messages: msgs, total } = await room.getHistory();
     expect(msgs).toBeInstanceOf(Array);
     expect(msgs.length).toBeGreaterThanOrEqual(2);
+    expect(typeof total).toBe("number");
   });
 
   it("respects limit option", async () => {
@@ -247,7 +249,7 @@ describe("SDK Room.getHistory", () => {
     const room = await jc.joinRoom(name, { name: "hist-agent" });
     rooms.push(room);
     for (let i = 0; i < 5; i++) await room.send(`m${i}`);
-    const msgs = await room.getHistory({ limit: 2 });
+    const { messages: msgs } = await room.getHistory({ limit: 2 });
     expect(msgs.length).toBeLessThanOrEqual(2);
   });
 
@@ -258,8 +260,8 @@ describe("SDK Room.getHistory", () => {
     const room = await jc.joinRoom(name, { name: "hist-agent" });
     rooms.push(room);
     for (let i = 0; i < 5; i++) await room.send(`m${i}`);
-    const all = await room.getHistory({ limit: 100 });
-    const offset = await room.getHistory({ limit: 100, offset: 2 });
+    const { messages: all } = await room.getHistory({ limit: 100 });
+    const { messages: offset } = await room.getHistory({ limit: 100, offset: 2 });
     expect(offset.length).toBe(all.length - 2);
   });
 
@@ -270,7 +272,7 @@ describe("SDK Room.getHistory", () => {
     const room = await jc.joinRoom(name, { name: "hist-agent" });
     rooms.push(room);
     await room.send("test body");
-    const msgs = await room.getHistory();
+    const { messages: msgs } = await room.getHistory();
     const msg = msgs.find((m) => m.body === "test body");
     expect(msg).toBeTruthy();
     expect(msg!.id).toBeTruthy();
@@ -287,7 +289,7 @@ describe("SDK Room.getHistory", () => {
     await jc.createRoom(name);
     const room = await jc.joinRoom(name, { name: "hist-agent" });
     rooms.push(room);
-    const msgs = await room.getHistory();
+    const { messages: msgs } = await room.getHistory();
     // Only bot join message
     const userMsgs = msgs.filter((m) => m.from !== "room-bot");
     expect(userMsgs.length).toBe(0);

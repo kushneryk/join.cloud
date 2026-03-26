@@ -10,7 +10,7 @@ export interface Store {
   getRoomById(id: string): Promise<Room | undefined>;
   getRoomsByName(name: string): Promise<Array<{ id: string; hasPassword: boolean }>>;
   getRoomByNameAndPassword(name: string, password: string): Promise<Room | undefined>;
-  listRooms(options?: { search?: string; limit?: number; offset?: number }): Promise<Array<{ name: string; agents: number; createdAt: string }>>;
+  listRooms(options?: { search?: string; limit?: number; offset?: number }): Promise<{ rooms: Array<{ name: string; agents: number; createdAt: string }>; total: number }>;
   deleteRoom(id: string): Promise<void>;
   checkRoomPassword(id: string, password: string): Promise<boolean>;
 
@@ -28,7 +28,7 @@ export interface Store {
 
   // Messages
   addMessage(msg: RoomMessage): Promise<void>;
-  getRoomMessages(roomId: string, limit?: number, offset?: number): Promise<RoomMessage[]>;
+  getRoomMessages(roomId: string, limit?: number, offset?: number): Promise<{ messages: RoomMessage[]; total: number }>;
   getLatestMessageId(roomId: string): Promise<string | null>;
   getMessagesSince(roomId: string, afterMessageId: string): Promise<RoomMessage[]>;
 }

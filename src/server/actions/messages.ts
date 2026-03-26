@@ -59,11 +59,11 @@ export function registerMessageMethods(server: JoinCloudServer) {
       const room = await ctx.store.getRoomById(params.roomId);
       if (!room) throw new Error(`Room not found: ${params.roomId}`);
 
-      const msgs = await ctx.store.getRoomMessages(params.roomId, params.limit ?? 20, params.offset ?? 0);
+      const { messages, total } = await ctx.store.getRoomMessages(params.roomId, params.limit ?? 20, params.offset ?? 0);
       return {
-        text: JSON.stringify(msgs, null, 2),
+        text: JSON.stringify(messages, null, 2),
         contextId: params.roomId,
-        data: { messages: msgs },
+        data: { messages, total },
       };
     },
   });

@@ -173,13 +173,15 @@ export function createSqliteStore(dataDir?: string): Store {
     async listRooms(options: { search?: string; limit?: number; offset?: number } = {}) {
       const limit = Math.min(Math.max(options.limit ?? 20, 1), 100);
       const offset = Math.max(options.offset ?? 0, 0);
-      const params: unknown[] = [];
+      const countParams: unknown[] = [];
       let where = "WHERE r.password = ''";
       if (options.search) {
         where += " AND r.name LIKE ?";
-        params.push(`%${options.search}%`);
+        countParams.push(`%${options.search}%`);
       }
-      params.push(limit, offset);
+      const totalRow = query(`SELECT COUNT(*) as total FROM rooms r ${where}`, countParams);
+      const total = totalRow[0]?.total as number ?? 0;
+      const params = [...countParams, limit, offset];
       const rows = query(`
         SELECT r.name, r.created_at, COUNT(a.name) as agent_count
         FROM rooms r
@@ -189,7 +191,10 @@ export function createSqliteStore(dataDir?: string): Store {
         ORDER BY r.name ASC
         LIMIT ? OFFSET ?
       `, params);
-      return rows.map((r) => ({ name: r.name, agents: r.agent_count, createdAt: r.created_at }));
+      return {
+        rooms: rows.map((r) => ({ name: r.name, agents: r.agent_count, createdAt: r.created_at })),
+        total,
+      };
     },
 
     async deleteRoom(id) {
@@ -280,14 +285,17 @@ export function createSqliteStore(dataDir?: string): Store {
     async getRoomMessages(roomId, limit = 20, offset = 0) {
       const safeLimit = Math.min(Math.max(limit, 1), 100);
       const safeOffset = Math.max(offset, 0);
+      const totalRow = query("SELECT COUNT(*) as total FROM messages WHERE room_id = ?", [roomId]);
+      const total = totalRow[0]?.total as number ?? 0;
       const rows = query(
         "SELECT * FROM messages WHERE room_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
         [roomId, safeLimit, safeOffset],
       );
-      return rows.reverse().map((r) => ({
+      const messages = rows.reverse().map((r) => ({
         id: r.id, roomId: r.room_id, from: r.from_agent,
         to: r.to_agent ?? undefined, body: r.body, timestamp: r.created_at,
       }));
+      return { messages, total };
     },
   };
 
