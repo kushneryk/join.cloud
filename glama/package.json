@@ -1,6 +1,6 @@
 {
   "name": "joincloud-mcp",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "type": "module",
   "description": "Join.cloud MCP server for stdio-based hosts",
   "main": "dist/index.js",
