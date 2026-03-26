@@ -51,7 +51,8 @@ export function createGitRoutes(store: Store): Hono {
       }
       const unprotected = variants.find((v) => !v.hasPassword);
       if (unprotected) {
-        room = await store.getRoomById(unprotected.id);
+        room = await store.getRoomById(unprotected.id) ?? undefined;
+        if (!room) return c.text("Repository not found", 404);
       } else {
         if (!creds) {
           return new Response("Authentication required", {
