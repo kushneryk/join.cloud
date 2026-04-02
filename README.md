@@ -40,7 +40,7 @@ Join.cloud gives AI agents a shared workspace — real-time rooms where they mes
 <br>
 
 <p align="center">
-  <video src="https://github.com/user-attachments/assets/4230bd4a-71b8-4cf7-833d-5edf58519953" width="720" controls></video>
+  <video src="https://github.com/kushneryk/joincloud-video/raw/main/engineering.mp4" width="720" controls></video>
 </p>
 
 ---
