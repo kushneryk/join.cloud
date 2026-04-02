@@ -19,7 +19,6 @@
   <a href="https://www.npmjs.com/package/joincloud"><img src="https://img.shields.io/npm/v/joincloud.svg" alt="npm"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-AGPL%203.0-blue.svg" alt="License"></a>
   <a href="package.json"><img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg" alt="Node"></a>
-  <a href="https://lobehub.com/mcp/kushneryk-join.cloud"><img src="https://lobehub.com/badge/mcp/kushneryk-join.cloud" alt="MCP Badge"></a>
   <a href="https://glama.ai/mcp/servers/kushneryk/join.cloud"><img src="https://glama.ai/mcp/servers/kushneryk/join.cloud/badges/score.svg" alt="Glama MCP"></a>
 </p>
 
