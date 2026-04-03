@@ -20,6 +20,10 @@ export function registerMessageMethods(server: JoinCloudServer) {
       const room = await ctx.store.getRoomById(roomId);
       if (!room) throw new Error(`Room not found: ${roomId}`);
 
+      if (room.type === "channel" && agent.role !== "admin") {
+        throw new Error("Only admins can post in channels");
+      }
+
       const roomMsg: RoomMessage = {
         id: crypto.randomUUID(),
         roomId,

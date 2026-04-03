@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { JoinCloudServer } from "../server.js";
+import type { Store } from "../storage/interface.js";
 import { botNotify } from "../bot.js";
 import { getMissedMessages } from "../helpers.js";
 
@@ -28,17 +29,31 @@ function validateEndpointUrl(url: string): void {
   }
 }
 
+async function requireAdmin(store: Store, agentToken: string): Promise<{ roomId: string; name: string; role: string }> {
+  const agent = await store.getAgentByToken(agentToken);
+  if (!agent) throw new Error("Invalid agentToken");
+  if (agent.role !== "admin") throw new Error("Admin role required");
+  return agent;
+}
+
 export function registerRoomMethods(server: JoinCloudServer) {
   server.method("room.create", {
-    description: "Create a new room",
+    description: "Create a new room and join as admin",
     params: z.object({
       name: z.string().optional().describe("Room name"),
       password: z.string().optional().describe("Optional password to protect the room"),
+      agentName: z.string().describe("Your display name in the room"),
+      description: z.string().max(5000).optional().describe("Room description (max 5000 chars)"),
+      type: z.enum(["group", "channel"]).optional().describe("Room type: group (default) or channel (admin-only posting)"),
     }),
     returns: z.object({
       roomId: z.string(),
       name: z.string(),
+      description: z.string(),
+      type: z.string(),
       passwordProtected: z.boolean(),
+      agentName: z.string(),
+      agentToken: z.string(),
     }),
     handler: async (params, ctx) => {
       const roomId = crypto.randomUUID();
@@ -55,8 +70,11 @@ export function registerRoomMethods(server: JoinCloudServer) {
         }
       }
 
+      const description = params.description ?? "";
+      const type = params.type ?? "group";
+
       try {
-        await ctx.store.createRoom(roomId, name, params.password);
+        await ctx.store.createRoom(roomId, name, params.password, { description, type });
       } catch (e: any) {
         if (e?.code === "23505") {
           throw new Error(`Room "${name}" already exists${params.password ? " with this password" : ""}.`);
@@ -64,10 +82,13 @@ export function registerRoomMethods(server: JoinCloudServer) {
         throw e;
       }
 
+      // Auto-join creator as admin
+      const agentToken = await ctx.store.addAgent(roomId, params.agentName, undefined, "admin");
+
       return {
-        text: `Room created: ${roomId}${params.password ? " (password protected)" : ""}`,
+        text: `Room created: ${roomId}${params.password ? " (password protected)" : ""}. Joined as ${params.agentName} (admin).`,
         contextId: roomId,
-        data: { roomId, name, passwordProtected: !!params.password },
+        data: { roomId, name, description, type, passwordProtected: !!params.password, agentName: params.agentName, agentToken },
       };
     },
   });
@@ -85,6 +106,7 @@ export function registerRoomMethods(server: JoinCloudServer) {
       roomId: z.string(),
       agentName: z.string(),
       agentToken: z.string(),
+      role: z.string(),
     }),
     handler: async (params, ctx) => {
       if (params.agentEndpoint) validateEndpointUrl(params.agentEndpoint);
@@ -113,6 +135,7 @@ export function registerRoomMethods(server: JoinCloudServer) {
           throw new Error(`Agent name "${params.agentName}" is already taken in this room. If you own this name, use your agentToken to reconnect.`);
         }
         await ctx.store.updateAgentEndpoint(params.agentToken, params.agentEndpoint);
+        const agent = await ctx.store.getAgentByToken(params.agentToken);
         const missed = await getMissedMessages(ctx.store, roomId, params.agentName);
         return {
           text: `Reconnected to room ${roomId} as ${params.agentName}`,
@@ -121,12 +144,14 @@ export function registerRoomMethods(server: JoinCloudServer) {
             roomId,
             agentName: params.agentName,
             agentToken: existingToken!,
+            role: agent?.role ?? "member",
             ...(missed.length > 0 && { missedMessages: missed, missedCount: missed.length }),
           },
         };
       }
 
-      const token = await ctx.store.addAgent(roomId, params.agentName, params.agentEndpoint);
+      const role = "member";
+      const token = await ctx.store.addAgent(roomId, params.agentName, params.agentEndpoint, role);
       await botNotify(roomId, `${params.agentName} joined the room`);
       const missed = await getMissedMessages(ctx.store, roomId, params.agentName);
 
@@ -137,6 +162,7 @@ export function registerRoomMethods(server: JoinCloudServer) {
           roomId,
           agentName: params.agentName,
           agentToken: token,
+          role,
           ...(missed.length > 0 && { missedMessages: missed, missedCount: missed.length }),
         },
       };
@@ -171,7 +197,9 @@ export function registerRoomMethods(server: JoinCloudServer) {
     returns: z.object({
       roomId: z.string(),
       name: z.string(),
-      agents: z.array(z.object({ name: z.string(), joinedAt: z.string() })),
+      description: z.string(),
+      type: z.string(),
+      agents: z.array(z.object({ name: z.string(), role: z.string(), joinedAt: z.string() })),
     }),
     handler: async (params, ctx) => {
       const room = await ctx.store.getRoom(params.roomId);
@@ -180,8 +208,11 @@ export function registerRoomMethods(server: JoinCloudServer) {
       const info = {
         roomId: room.id,
         name: room.name,
+        description: room.description,
+        type: room.type,
         agents: Array.from(room.agents.values()).map((a) => ({
           name: a.name,
+          role: a.role,
           joinedAt: a.joinedAt,
         })),
       };
@@ -210,6 +241,110 @@ export function registerRoomMethods(server: JoinCloudServer) {
       return {
         text: JSON.stringify(rooms, null, 2),
         data: { rooms, total },
+      };
+    },
+  });
+
+  server.method("room.promote", {
+    description: "Promote a member to admin (admin only)",
+    params: z.object({
+      agentToken: z.string().describe("Your agentToken from joinRoom"),
+      targetAgent: z.string().describe("Agent name to promote"),
+    }),
+    handler: async (params, ctx) => {
+      const admin = await requireAdmin(ctx.store, params.agentToken);
+      const exists = await ctx.store.agentExistsInRoom(admin.roomId, params.targetAgent);
+      if (!exists) throw new Error(`Agent "${params.targetAgent}" not found in room`);
+
+      await ctx.store.setAgentRole(admin.roomId, params.targetAgent, "admin");
+      await botNotify(admin.roomId, `${admin.name} promoted ${params.targetAgent} to admin`);
+
+      return {
+        text: `Promoted ${params.targetAgent} to admin`,
+        contextId: admin.roomId,
+      };
+    },
+  });
+
+  server.method("room.demote", {
+    description: "Demote an admin to member (admin only)",
+    params: z.object({
+      agentToken: z.string().describe("Your agentToken from joinRoom"),
+      targetAgent: z.string().describe("Agent name to demote"),
+    }),
+    handler: async (params, ctx) => {
+      const admin = await requireAdmin(ctx.store, params.agentToken);
+      const exists = await ctx.store.agentExistsInRoom(admin.roomId, params.targetAgent);
+      if (!exists) throw new Error(`Agent "${params.targetAgent}" not found in room`);
+
+      const agents = await ctx.store.getRoomAgents(admin.roomId);
+      const adminCount = agents.filter((a) => a.role === "admin").length;
+      const target = agents.find((a) => a.name === params.targetAgent);
+      if (target?.role === "admin" && adminCount <= 1) {
+        throw new Error("Cannot demote the last admin");
+      }
+
+      await ctx.store.setAgentRole(admin.roomId, params.targetAgent, "member");
+      await botNotify(admin.roomId, `${admin.name} demoted ${params.targetAgent} to member`);
+
+      return {
+        text: `Demoted ${params.targetAgent} to member`,
+        contextId: admin.roomId,
+      };
+    },
+  });
+
+  server.method("room.kick", {
+    description: "Remove an agent from the room (admin only)",
+    params: z.object({
+      agentToken: z.string().describe("Your agentToken from joinRoom"),
+      targetAgent: z.string().describe("Agent name to kick"),
+    }),
+    handler: async (params, ctx) => {
+      const admin = await requireAdmin(ctx.store, params.agentToken);
+      if (admin.name === params.targetAgent) throw new Error("Cannot kick yourself");
+
+      const exists = await ctx.store.agentExistsInRoom(admin.roomId, params.targetAgent);
+      if (!exists) throw new Error(`Agent "${params.targetAgent}" not found in room`);
+
+      await ctx.store.removeAgent(admin.roomId, params.targetAgent);
+      await botNotify(admin.roomId, `${admin.name} kicked ${params.targetAgent} from the room`);
+
+      return {
+        text: `Kicked ${params.targetAgent} from the room`,
+        contextId: admin.roomId,
+      };
+    },
+  });
+
+  server.method("room.update", {
+    description: "Update room description and/or type (admin only)",
+    params: z.object({
+      agentToken: z.string().describe("Your agentToken from joinRoom"),
+      description: z.string().max(5000).optional().describe("Room description (max 5000 chars)"),
+      type: z.enum(["group", "channel"]).optional().describe("Room type: group or channel"),
+    }),
+    handler: async (params, ctx) => {
+      if (params.description === undefined && params.type === undefined) {
+        throw new Error("At least one of description or type must be provided");
+      }
+
+      const admin = await requireAdmin(ctx.store, params.agentToken);
+
+      const fields: { description?: string; type?: string } = {};
+      if (params.description !== undefined) fields.description = params.description;
+      if (params.type !== undefined) fields.type = params.type;
+
+      await ctx.store.updateRoom(admin.roomId, fields);
+
+      const parts: string[] = [];
+      if (params.description !== undefined) parts.push("description");
+      if (params.type !== undefined) parts.push(`type to ${params.type}`);
+      await botNotify(admin.roomId, `${admin.name} updated room ${parts.join(" and ")}`);
+
+      return {
+        text: `Room updated: ${parts.join(", ")}`,
+        contextId: admin.roomId,
       };
     },
   });

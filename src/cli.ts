@@ -53,8 +53,9 @@ if (hasFlag("server")) {
 
       case "create": {
         const name = args[args.indexOf("create") + 1];
-        if (!name || name.startsWith("--")) { console.error("Usage: joincloud create <name>"); process.exit(1); }
-        const result = await client.createRoom(name, { password: flag("password") });
+        if (!name || name.startsWith("--")) { console.error("Usage: joincloud create <name> --name <agentName>"); process.exit(1); }
+        const agentName = flag("name") ?? `cli-${Date.now()}`;
+        const result = await client.createRoom(name, { agentName, password: flag("password"), description: flag("description"), type: flag("type") as any });
         console.log(`Room created: ${result.name} (${result.roomId})`);
         break;
       }
@@ -64,9 +65,11 @@ if (hasFlag("server")) {
         if (!room || room.startsWith("--")) { console.error("Usage: joincloud info <room>"); process.exit(1); }
         const info = await client.roomInfo(room);
         console.log(`Room: ${info.name} (${info.roomId})`);
+        console.log(`Type: ${info.type}`);
+        if (info.description) console.log(`Description: ${info.description}`);
         console.log(`Agents (${info.agents.length}):`);
         for (const a of info.agents) {
-          console.log(`  ${a.name}  (joined: ${a.joinedAt})`);
+          console.log(`  ${a.name}  [${a.role}]  (joined: ${a.joinedAt})`);
         }
         break;
       }

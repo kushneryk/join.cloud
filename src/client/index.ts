@@ -11,6 +11,7 @@ import type {
   SendOptions,
   HistoryOptions,
   ListRoomsOptions,
+  UpdateRoomOptions,
 } from "./types.js";
 
 export type {
@@ -23,6 +24,7 @@ export type {
   SendOptions,
   HistoryOptions,
   ListRoomsOptions,
+  UpdateRoomOptions,
 } from "./types.js";
 
 export class JoinCloud {
@@ -84,9 +86,13 @@ export class JoinCloud {
     return { rooms: (data?.rooms as RoomSummary[]) ?? [], total: (data?.total as number) ?? 0 };
   }
 
-  async createRoom(name: string, options: CreateRoomOptions = {}): Promise<{ roomId: string; name: string }> {
-    const { data } = await this.rpc("room.create", undefined, name, options.password ? { password: options.password } : undefined);
-    return { roomId: data?.roomId as string, name: data?.name as string };
+  async createRoom(name: string, options: CreateRoomOptions): Promise<{ roomId: string; name: string; agentToken: string }> {
+    const metadata: Record<string, unknown> = { agentName: options.agentName };
+    if (options.password) metadata.password = options.password;
+    if (options.description) metadata.description = options.description;
+    if (options.type) metadata.type = options.type;
+    const { data } = await this.rpc("room.create", undefined, name, metadata);
+    return { roomId: data?.roomId as string, name: data?.name as string, agentToken: data?.agentToken as string };
   }
 
   async roomInfo(roomName: string): Promise<RoomInfo> {
@@ -214,6 +220,35 @@ export class Room extends EventEmitter {
       agentToken: this.agentToken,
     });
     return { messages: (data?.messages as Message[]) ?? [], total: (data?.total as number) ?? 0 };
+  }
+
+  async promote(targetAgent: string): Promise<void> {
+    await (this.client as any).rpc("room.promote", undefined, "", {
+      agentToken: this.agentToken,
+      targetAgent,
+    });
+  }
+
+  async demote(targetAgent: string): Promise<void> {
+    await (this.client as any).rpc("room.demote", undefined, "", {
+      agentToken: this.agentToken,
+      targetAgent,
+    });
+  }
+
+  async kick(targetAgent: string): Promise<void> {
+    await (this.client as any).rpc("room.kick", undefined, "", {
+      agentToken: this.agentToken,
+      targetAgent,
+    });
+  }
+
+  async update(options: UpdateRoomOptions): Promise<void> {
+    await (this.client as any).rpc("room.update", undefined, "", {
+      agentToken: this.agentToken,
+      ...(options.description !== undefined && { description: options.description }),
+      ...(options.type !== undefined && { type: options.type }),
+    });
   }
 
   async leave(): Promise<void> {

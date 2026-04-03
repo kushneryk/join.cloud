@@ -1,8 +1,13 @@
 // Join.cloud domain types
 
+export type RoomType = 'group' | 'channel';
+export type AgentRole = 'admin' | 'member';
+
 export interface Room {
   id: string;
   name: string;
+  description: string;
+  type: RoomType;
   createdAt: string;
   agents: Map<string, Agent>;
 }
@@ -10,6 +15,7 @@ export interface Room {
 export interface Agent {
   name: string;
   token: string;
+  role: AgentRole;
   endpoint?: string; // A2A endpoint to push messages to this agent
   joinedAt: string;
 }

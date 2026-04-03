@@ -3,8 +3,9 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import initSqlJs, { type Database } from "sql.js";
-import type { Room, RoomMessage, Agent } from "../types.js";
+import type { Room, RoomMessage, Agent, AgentRole } from "../types.js";
 import type { Store } from "./interface.js";
+import { runMigrations } from "./migrations/index.js";
 
 type Row = Record<string, any>;
 
@@ -48,6 +49,7 @@ export function createSqliteStore(dataDir?: string): Store {
       agentMap.set(a.name, {
         name: a.name,
         token: a.token,
+        role: (a.role ?? "member") as AgentRole,
         endpoint: a.endpoint ?? undefined,
         joinedAt: a.joined_at,
       });
@@ -55,6 +57,8 @@ export function createSqliteStore(dataDir?: string): Store {
     return {
       id: row.id,
       name: row.name,
+      description: row.description ?? "",
+      type: row.type ?? "group",
       createdAt: row.created_at,
       agents: agentMap,
     };
@@ -75,49 +79,15 @@ export function createSqliteStore(dataDir?: string): Store {
       db.run("PRAGMA journal_mode=WAL");
       db.run("PRAGMA foreign_keys=ON");
 
-      db.run(`
-        CREATE TABLE IF NOT EXISTS rooms (
-          id TEXT PRIMARY KEY,
-          name TEXT NOT NULL,
-          password TEXT NOT NULL DEFAULT '',
-          created_at TEXT NOT NULL DEFAULT (datetime('now'))
-        )
-      `);
-
-      db.run(`
-        CREATE TABLE IF NOT EXISTS agents (
-          room_id TEXT NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
-          name TEXT NOT NULL,
-          token TEXT,
-          endpoint TEXT,
-          last_seen_msg_id TEXT,
-          joined_at TEXT NOT NULL DEFAULT (datetime('now')),
-          PRIMARY KEY (room_id, name)
-        )
-      `);
-
-      db.run(`
-        CREATE TABLE IF NOT EXISTS messages (
-          id TEXT PRIMARY KEY,
-          room_id TEXT NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
-          from_agent TEXT NOT NULL,
-          to_agent TEXT,
-          body TEXT NOT NULL,
-          created_at TEXT NOT NULL DEFAULT (datetime('now'))
-        )
-      `);
-
-      db.run("CREATE INDEX IF NOT EXISTS idx_messages_room ON messages(room_id, created_at)");
-      db.run("CREATE UNIQUE INDEX IF NOT EXISTS idx_rooms_name_password ON rooms(name, password)");
-      db.run("CREATE INDEX IF NOT EXISTS idx_rooms_created_at ON rooms(created_at)");
-      db.run("CREATE UNIQUE INDEX IF NOT EXISTS idx_agents_token ON agents(token)");
-
+      runMigrations(db);
       save();
     },
 
-    async createRoom(id, name, password?) {
+    async createRoom(id, name, password?, options?) {
+      const description = options?.description ?? "";
+      const type = options?.type ?? "group";
       try {
-        run("INSERT INTO rooms (id, name, password) VALUES (?, ?, ?)", [id, name, hashPassword(password ?? "")]);
+        run("INSERT INTO rooms (id, name, password, description, type) VALUES (?, ?, ?, ?, ?)", [id, name, hashPassword(password ?? ""), description, type]);
       } catch (e: any) {
         if (e?.message?.includes("UNIQUE constraint failed")) {
           const err = new Error(`Room "${name}" already exists`) as any;
@@ -126,7 +96,7 @@ export function createSqliteStore(dataDir?: string): Store {
         }
         throw e;
       }
-      return { id, name, createdAt: new Date().toISOString(), agents: new Map() };
+      return { id, name, description, type: type as Room["type"], createdAt: new Date().toISOString(), agents: new Map() };
     },
 
     async checkRoomPassword(id, password) {
@@ -173,7 +143,7 @@ export function createSqliteStore(dataDir?: string): Store {
       const total = totalRow[0]?.total as number ?? 0;
       const params = [...countParams, limit, offset];
       const rows = query(`
-        SELECT r.name, r.created_at, COUNT(a.name) as agent_count
+        SELECT r.name, r.description, r.type, r.created_at, COUNT(a.name) as agent_count
         FROM rooms r
         LEFT JOIN agents a ON a.room_id = r.id
         ${where}
@@ -182,7 +152,7 @@ export function createSqliteStore(dataDir?: string): Store {
         LIMIT ? OFFSET ?
       `, params);
       return {
-        rooms: rows.map((r) => ({ name: r.name, agents: r.agent_count, createdAt: r.created_at })),
+        rooms: rows.map((r) => ({ name: r.name, description: r.description ?? "", type: r.type ?? "group", agents: r.agent_count, createdAt: r.created_at })),
         total,
       };
     },
@@ -202,9 +172,25 @@ export function createSqliteStore(dataDir?: string): Store {
       return rows.map((r) => ({ id: r.id, hasPassword: r.password !== "" }));
     },
 
-    async addAgent(roomId, name, endpoint?) {
+    async updateRoom(roomId, fields) {
+      const sets: string[] = [];
+      const params: any[] = [];
+      if (fields.description !== undefined) {
+        sets.push("description = ?");
+        params.push(fields.description);
+      }
+      if (fields.type !== undefined) {
+        sets.push("type = ?");
+        params.push(fields.type);
+      }
+      if (sets.length === 0) return;
+      params.push(roomId);
+      run(`UPDATE rooms SET ${sets.join(", ")} WHERE id = ?`, params);
+    },
+
+    async addAgent(roomId, name, endpoint?, role?) {
       const token = crypto.randomUUID();
-      run("INSERT INTO agents (room_id, name, token, endpoint) VALUES (?, ?, ?, ?)", [roomId, name, token, endpoint ?? null]);
+      run("INSERT INTO agents (room_id, name, token, endpoint, role) VALUES (?, ?, ?, ?, ?)", [roomId, name, token, endpoint ?? null, role ?? "member"]);
       return token;
     },
 
@@ -218,9 +204,9 @@ export function createSqliteStore(dataDir?: string): Store {
     },
 
     async getAgentByToken(token) {
-      const rows = query("SELECT room_id, name, endpoint FROM agents WHERE token = ?", [token]);
+      const rows = query("SELECT room_id, name, role, endpoint FROM agents WHERE token = ?", [token]);
       if (rows.length === 0) return undefined;
-      return { roomId: rows[0].room_id, name: rows[0].name, endpoint: rows[0].endpoint ?? undefined };
+      return { roomId: rows[0].room_id, name: rows[0].name, role: rows[0].role ?? "member", endpoint: rows[0].endpoint ?? undefined };
     },
 
     async removeAgent(roomId, name) {
@@ -263,8 +249,13 @@ export function createSqliteStore(dataDir?: string): Store {
       const rows = query("SELECT * FROM agents WHERE room_id = ?", [roomId]);
       return rows.map((a) => ({
         name: a.name, token: a.token,
+        role: (a.role ?? "member") as AgentRole,
         endpoint: a.endpoint ?? undefined, joinedAt: a.joined_at,
       }));
+    },
+
+    async setAgentRole(roomId, name, role) {
+      run("UPDATE agents SET role = ? WHERE room_id = ? AND name = ?", [role, roomId, name]);
     },
 
     async addMessage(msg) {

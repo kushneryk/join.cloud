@@ -8,65 +8,94 @@ describe("A2A room.create", () => {
   // --- Positive ---
   it("creates a room with a name", async () => {
     const name = uniqueName("room");
-    const res = await a2a("room.create", undefined, name);
+    const res = await a2a("room.create", undefined, name, { agentName: "creator" });
     expect(isError(res)).toBe(false);
     const data = resultData(res);
     expect(data.roomId).toBeTruthy();
     expect(data.name).toBe(name);
     expect(data.passwordProtected).toBe(false);
+    expect(data.agentToken).toBeTruthy();
+    expect(data.agentName).toBe("creator");
   });
 
   it("creates a room with a password", async () => {
     const name = uniqueName("room");
-    const res = await a2a("room.create", undefined, name, { password: "secret" });
+    const res = await a2a("room.create", undefined, name, { agentName: "creator", password: "secret" });
     expect(isError(res)).toBe(false);
     const data = resultData(res);
     expect(data.roomId).toBeTruthy();
     expect(data.name).toBe(name);
     expect(data.passwordProtected).toBe(true);
+    expect(data.agentToken).toBeTruthy();
   });
 
   it("creates a room without a name (auto-generated)", async () => {
-    const res = await a2a("room.create");
+    const res = await a2a("room.create", undefined, undefined, { agentName: "creator" });
     expect(isError(res)).toBe(false);
     const data = resultData(res);
     expect(data.roomId).toBeTruthy();
     expect(data.name).toBeTruthy();
+    expect(data.agentToken).toBeTruthy();
+  });
+
+  it("creates a room with description and type", async () => {
+    const name = uniqueName("room");
+    const res = await a2a("room.create", undefined, name, { agentName: "creator", description: "A test room", type: "channel" });
+    expect(isError(res)).toBe(false);
+    const data = resultData(res);
+    expect(data.description).toBe("A test room");
+    expect(data.type).toBe("channel");
+  });
+
+  it("creator is auto-joined as admin", async () => {
+    const { name } = await createRoom();
+    const info = await a2a("room.info", name);
+    const data = resultData(info);
+    expect(data.agents).toHaveLength(1);
+    expect(data.agents[0].name).toBe("creator");
+    expect(data.agents[0].role).toBe("admin");
   });
 
   // --- Negative ---
   it("rejects reserved room name 'mcp'", async () => {
-    const res = await a2a("room.create", undefined, "mcp");
+    const res = await a2a("room.create", undefined, "mcp", { agentName: "creator" });
     expect(isError(res)).toBe(true);
   });
 
   it("rejects reserved room name 'a2a'", async () => {
-    const res = await a2a("room.create", undefined, "a2a");
+    const res = await a2a("room.create", undefined, "a2a", { agentName: "creator" });
     expect(isError(res)).toBe(true);
   });
 
   it("rejects duplicate room name (no password)", async () => {
     const name = uniqueName("room");
     await createRoom(name);
-    const res = await a2a("room.create", undefined, name);
+    const res = await a2a("room.create", undefined, name, { agentName: "creator" });
     expect(isError(res)).toBe(true);
     expect(resultText(res)).toContain("already exists");
   });
 
   it("rejects duplicate room name+password combo", async () => {
     const name = uniqueName("room");
-    await a2a("room.create", undefined, name, { password: "pass1" });
-    const res = await a2a("room.create", undefined, name, { password: "pass1" });
+    await a2a("room.create", undefined, name, { agentName: "creator", password: "pass1" });
+    const res = await a2a("room.create", undefined, name, { agentName: "creator2", password: "pass1" });
     expect(isError(res)).toBe(true);
     expect(resultText(res)).toContain("already exists");
   });
 
   it("rejects unprotected room when protected one exists with same name", async () => {
     const name = uniqueName("room");
-    await a2a("room.create", undefined, name, { password: "pass1" });
-    const res = await a2a("room.create", undefined, name);
+    await a2a("room.create", undefined, name, { agentName: "creator", password: "pass1" });
+    const res = await a2a("room.create", undefined, name, { agentName: "creator2" });
     expect(isError(res)).toBe(true);
     expect(resultText(res)).toContain("password");
+  });
+
+  it("rejects create without agentName", async () => {
+    const name = uniqueName("room");
+    const res = await a2a("room.create", undefined, name);
+    expect(isError(res)).toBe(true);
+    expect(resultText(res)).toContain("agentName");
   });
 });
 
@@ -75,11 +104,12 @@ describe("A2A room.create", () => {
 // ============================================================
 describe("A2A room.join", () => {
   // --- Positive ---
-  it("joins a room and returns agentToken", async () => {
+  it("joins a room and returns agentToken with member role", async () => {
     const { name } = await createRoom();
     const res = await joinRoom(name, "agent1");
     expect(res.agentToken).toBeTruthy();
     expect(res.roomId).toBeTruthy();
+    expect(res.role).toBe("member");
     expect(resultText(res)).toContain("Joined");
   });
 
@@ -93,7 +123,7 @@ describe("A2A room.join", () => {
 
   it("joins password-protected room with correct password", async () => {
     const name = uniqueName("room");
-    await a2a("room.create", undefined, name, { password: "secret" });
+    await a2a("room.create", undefined, name, { agentName: "creator", password: "secret" });
     const res = await a2a("room.join", `${name}:secret`, "", { agentName: "agent1" });
     expect(isError(res)).toBe(false);
     expect(resultData(res).agentToken).toBeTruthy();
@@ -136,7 +166,7 @@ describe("A2A room.join", () => {
 
   it("rejects wrong password", async () => {
     const name = uniqueName("room");
-    await a2a("room.create", undefined, name, { password: "correct" });
+    await a2a("room.create", undefined, name, { agentName: "creator", password: "correct" });
     const res = await a2a("room.join", `${name}:wrong`, "", { agentName: "agent1" });
     expect(isError(res)).toBe(true);
     expect(resultText(res)).toContain("Invalid room password");
@@ -170,7 +200,9 @@ describe("A2A room.leave", () => {
     await a2a("room.leave", undefined, "", { agentToken });
     const info = await a2a("room.info", name);
     const data = resultData(info);
-    expect(data.agents).toHaveLength(0);
+    // Only creator remains
+    expect(data.agents).toHaveLength(1);
+    expect(data.agents[0].name).toBe("creator");
   });
 
   // --- Negative ---
@@ -192,7 +224,7 @@ describe("A2A room.leave", () => {
 // ============================================================
 describe("A2A room.info", () => {
   // --- Positive ---
-  it("returns room info with agents", async () => {
+  it("returns room info with agents and roles", async () => {
     const { name } = await createRoom();
     await joinRoom(name, "agent1");
     const res = await a2a("room.info", name);
@@ -200,16 +232,29 @@ describe("A2A room.info", () => {
     const data = resultData(res);
     expect(data.roomId).toBeTruthy();
     expect(data.name).toBe(name);
-    expect(data.agents).toHaveLength(1);
-    expect(data.agents[0].name).toBe("agent1");
-    expect(data.agents[0].joinedAt).toBeTruthy();
+    // creator + agent1
+    expect(data.agents).toHaveLength(2);
+    const creator = data.agents.find((a: any) => a.name === "creator");
+    const agent1 = data.agents.find((a: any) => a.name === "agent1");
+    expect(creator.role).toBe("admin");
+    expect(agent1.role).toBe("member");
+    expect(agent1.joinedAt).toBeTruthy();
   });
 
-  it("returns empty agents for room with no participants", async () => {
+  it("returns room description and type", async () => {
+    const { name } = await createRoom(undefined, undefined, { description: "My desc", type: "channel" });
+    const res = await a2a("room.info", name);
+    const data = resultData(res);
+    expect(data.description).toBe("My desc");
+    expect(data.type).toBe("channel");
+  });
+
+  it("returns only creator for room with no additional participants", async () => {
     const { name } = await createRoom();
     const res = await a2a("room.info", name);
     const data = resultData(res);
-    expect(data.agents).toHaveLength(0);
+    expect(data.agents).toHaveLength(1);
+    expect(data.agents[0].name).toBe("creator");
   });
 
   // --- Negative ---
@@ -241,13 +286,15 @@ describe("A2A room.list", () => {
   });
 
   it("includes room metadata in list", async () => {
-    const { name } = await createRoom();
+    const { name } = await createRoom(undefined, undefined, { description: "List desc", type: "channel" });
     const res = await a2a("room.list", undefined, undefined, { search: name });
     const data = resultData(res);
     const room = data.rooms.find((r: any) => r.name === name);
     expect(room).toBeTruthy();
     expect(room.createdAt).toBeTruthy();
     expect(typeof room.agents).toBe("number");
+    expect(room.description).toBe("List desc");
+    expect(room.type).toBe("channel");
   });
 
   // --- Negative ---

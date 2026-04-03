@@ -89,18 +89,16 @@ test.beforeAll(async () => {
   });
 
   // Create a test room with messages
-  const createRes = await a2a("room.create", undefined, "e2e-test-room");
-  const roomId = createRes.result?.message?.contextId;
-  if (roomId) {
-    const joinRes = await a2a("room.join", roomId, "", { agentName: "test-agent" });
-    const token = joinRes.result?.message?.metadata?.agentToken;
-    if (token) {
-      await a2a("message.send", roomId, "", { agentToken: token, text: "Hello from e2e test" });
-    }
+  const createRes = await a2a("room.create", undefined, "e2e-test-room", { agentName: "test-agent" });
+  const createData = createRes.result?.parts?.find((p: any) => p.data)?.data;
+  const roomId = createData?.roomId;
+  const token = createData?.agentToken;
+  if (roomId && token) {
+    await a2a("message.send", undefined, "Hello from e2e test", { agentToken: token });
   }
 
   // Create a password-protected room
-  await a2a("room.create", undefined, "pw-room", { password: "secret123" });
+  await a2a("room.create", undefined, "pw-room", { agentName: "pw-creator", password: "secret123" });
 
   teardown = async () => {
     httpServer.close();

@@ -136,12 +136,13 @@ describe("CLI info", () => {
     expect(out).toContain("Agents");
   });
 
-  it("shows agents in room info", () => {
-    // Create and join via A2A first, then check CLI info
+  it("shows agents in room info (creator auto-joined)", () => {
     const name = uniqueName("cli-room");
-    run(`create ${name}`);
+    run(`create ${name} --name cli-admin`);
     const out = run(`info ${name}`);
-    expect(out).toContain("Agents (0)");
+    expect(out).toContain("Agents (1)");
+    expect(out).toContain("cli-admin");
+    expect(out).toContain("[admin]");
   });
 
   // --- Negative ---

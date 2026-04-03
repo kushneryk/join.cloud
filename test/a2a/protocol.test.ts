@@ -43,7 +43,7 @@ describe("A2A protocol", () => {
   // --- action aliases ---
   it("alias 'create' works same as 'room.create'", async () => {
     const name = `alias-${Date.now()}`;
-    const res = await a2a("create", undefined, name);
+    const res = await a2a("create", undefined, name, { agentName: "creator" });
     expect(isError(res)).toBe(false);
     expect(resultData(res).roomId).toBeTruthy();
   });

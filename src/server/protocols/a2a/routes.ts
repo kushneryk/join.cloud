@@ -55,6 +55,10 @@ const ACTION_ALIASES: Record<string, string> = {
   "send": "message.send",
   "history": "message.history",
   "unread": "message.unread",
+  "promote": "room.promote",
+  "demote": "room.demote",
+  "kick": "room.kick",
+  "update": "room.update",
 };
 
 function createHandler(registry: MethodRegistry, store: Store) {

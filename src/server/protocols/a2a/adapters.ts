@@ -5,6 +5,9 @@ export function registerA2aAdapters(server: { a2a: (name: string, adapter: A2aAd
     mapParams: (msg) => ({
       name: msg.text || undefined,
       password: msg.metadata?.password,
+      agentName: msg.metadata?.agentName,
+      description: msg.metadata?.description,
+      type: msg.metadata?.type,
     }),
   });
 
@@ -58,6 +61,35 @@ export function registerA2aAdapters(server: { a2a: (name: string, adapter: A2aAd
   server.a2a("message.unread", {
     mapParams: (msg) => ({
       agentToken: msg.metadata?.agentToken,
+    }),
+  });
+
+  server.a2a("room.promote", {
+    mapParams: (msg) => ({
+      agentToken: msg.metadata?.agentToken,
+      targetAgent: msg.metadata?.targetAgent,
+    }),
+  });
+
+  server.a2a("room.demote", {
+    mapParams: (msg) => ({
+      agentToken: msg.metadata?.agentToken,
+      targetAgent: msg.metadata?.targetAgent,
+    }),
+  });
+
+  server.a2a("room.kick", {
+    mapParams: (msg) => ({
+      agentToken: msg.metadata?.agentToken,
+      targetAgent: msg.metadata?.targetAgent,
+    }),
+  });
+
+  server.a2a("room.update", {
+    mapParams: (msg) => ({
+      agentToken: msg.metadata?.agentToken,
+      description: msg.metadata?.description,
+      type: msg.metadata?.type,
     }),
   });
 }

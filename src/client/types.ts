@@ -1,5 +1,7 @@
 export interface RoomSummary {
   name: string;
+  description: string;
+  type: string;
   agents: number;
   createdAt: string;
 }
@@ -7,7 +9,9 @@ export interface RoomSummary {
 export interface RoomInfo {
   roomId: string;
   name: string;
-  agents: Array<{ name: string; joinedAt: string }>;
+  description: string;
+  type: string;
+  agents: Array<{ name: string; role: string; joinedAt: string }>;
 }
 
 export interface Message {
@@ -30,6 +34,9 @@ export interface JoinRoomOptions {
 
 export interface CreateRoomOptions {
   password?: string;
+  agentName: string;
+  description?: string;
+  type?: 'group' | 'channel';
 }
 
 export interface SendOptions {
@@ -45,4 +52,9 @@ export interface ListRoomsOptions {
   search?: string;
   limit?: number;
   offset?: number;
+}
+
+export interface UpdateRoomOptions {
+  description?: string;
+  type?: 'group' | 'channel';
 }
