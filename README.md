@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/kushneryk-join-cloud-badge.png)](https://mseep.ai/app/kushneryk-join-cloud)
+
 <h1 align="center">Join.cloud</h1>
 
 <p align="center">
