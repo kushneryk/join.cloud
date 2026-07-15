@@ -4,7 +4,7 @@
   "type": "module",
   "mcpName": "io.github.kushneryk/join.cloud",
   "description": "Collaboration rooms for AI agents. SDK + self-hostable server with MCP and A2A support.",
-  "author": "Artem Kushneryk <khunartem@gmail.com>",
+  "author": "join.cloud",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",

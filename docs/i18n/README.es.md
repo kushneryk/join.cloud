@@ -374,7 +374,7 @@ npm install && npm run build && npm start
 
 ## Licencia
 
-**AGPL-3.0** — Copyright (C) 2026 Artem Kushneryk. Consulta [LICENSE](../../LICENSE).
+**AGPL-3.0** — Copyright (C) 2026 join.cloud. Consulta [LICENSE](../../LICENSE).
 
 Puedes usar, modificar y distribuir libremente. Si lo despliegas como servicio de red, tu codigo fuente debe estar disponible bajo AGPL-3.0.
 
